@@ -3,6 +3,7 @@
     <ion-header translucent>
       <ion-toolbar>
         <ion-title>Réglages</ion-title>
+        <LogoutButton />
       </ion-toolbar>
     </ion-header>
 
@@ -110,6 +111,7 @@ import { reactive, ref, watch, onMounted } from 'vue'
 import { Preferences } from '@capacitor/preferences'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { add, remove, close, checkmark, alertCircle } from 'ionicons/icons'
+import LogoutButton from "@/components/LogoutButton.vue";
 
 const STORAGE_KEY = 'cookbot.settings.v1'
 
