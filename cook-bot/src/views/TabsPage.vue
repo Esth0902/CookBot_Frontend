@@ -8,7 +8,7 @@
           <ion-label>Accueil</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="myfridge" href="/tabs/myFridge">
+        <ion-tab-button tab="myfridge" href="/tabs/myfridge">
           <ion-icon :icon="camera" />
           <ion-label>Mon Frigo</ion-label>
         </ion-tab-button>

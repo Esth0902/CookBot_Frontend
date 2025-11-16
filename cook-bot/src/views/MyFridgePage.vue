@@ -3,12 +3,14 @@
     <ion-header>
       <ion-toolbar>
         <ion-title>CookBot</ion-title>
+        <LogoutButton />
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">Mon frigo</ion-title>
+
         </ion-toolbar>
       </ion-header>
 
@@ -49,5 +51,6 @@ import {
   IonImg,
 } from '@ionic/vue';
 import { usePhotoGallery, UserPhoto } from '@/composables/usePhotoGallery';
+import LogoutButton from "@/components/LogoutButton.vue";
 const { photos, takePhoto } = usePhotoGallery()
 </script>
