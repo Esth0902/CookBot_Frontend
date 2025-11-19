@@ -1,11 +1,6 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>CookBot</ion-title>
-        <LogoutButton />
-      </ion-toolbar>
-    </ion-header>
+
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>

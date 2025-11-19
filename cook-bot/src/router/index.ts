@@ -28,7 +28,7 @@ const routes: Array<RouteRecordRaw> = [
             redirect: '/tabs/home'
         },
         {
-            path: 'home',
+            path: 'landing',
             component: () => import('@/views/LandingPage.vue')
         },
         {
@@ -38,7 +38,24 @@ const routes: Array<RouteRecordRaw> = [
         {
             path: 'settings',
             component: () => import('@/views/SettingsPage.vue')
-        }
+        },
+        {
+            path: 'home',
+            component: () => import('@/views/HomePage.vue')
+        },
+
+        {
+            path:'favorites',
+            component: () => import('@/views/FavoritesPage.vue')
+        },
+        {
+            path:'recipes',
+            component:() => import('@/views/RecipesPage.vue')
+        },
+        {
+            path:'shopping',
+            component: () => import('@/views/ShoppingPage.vue')
+        },
         ]
     }
 ]
