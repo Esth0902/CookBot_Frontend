@@ -15,8 +15,11 @@ const logout = () => {
 
 <template>
   <ion-buttons slot="end">
-    <ion-button @click="logout">
-      <ion-icon :icon="logOutOutline" slot="icon-only" />
+    <ion-button @click="logout"
+                style="--padding-start: 0; --padding-end: 0; width: 40px; height: 40px;"
+    >
+      <ion-icon :icon="logOutOutline"
+                style="font-size: 32px; width: 32px; height: 32px; color: var(--ion-color-tertiary);"/>
     </ion-button>
   </ion-buttons>
 </template>

@@ -7,3 +7,13 @@
     --ion-text-color: #ffffff; /* Texte */
 }
 
+.logo-header {
+    height: 70px;
+    width: auto;
+}
+
+.icon-header {
+    color: var(--ion-color-tertiary);
+    height: 40px;
+    width: 40px;
+}

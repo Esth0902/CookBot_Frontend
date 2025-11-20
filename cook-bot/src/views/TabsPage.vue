@@ -2,11 +2,17 @@
   <ion-page>
 
     <ion-header>
-      <ion-toolbar slot="end">
-          <ion-tab-button tab='settings' href="/tabs/settings">
-            <ion-icon :icon="personCircleOutline"></ion-icon>
-          </ion-tab-button>
-          <LogoutButton />
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <img src="/public/LogoCookBot.png" alt="Logo CookBot" class="logo-header"/>
+        </ion-buttons>
+          <ion-buttons slot="end">
+            <ion-button tab='settings' href="/tabs/settings">
+              <ion-icon :icon="personCircleOutline" class="icon-header"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <LogoutButton class="icon-header"/>
+
       </ion-toolbar>
     </ion-header>
 
