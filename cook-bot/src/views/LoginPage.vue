@@ -51,7 +51,8 @@ const handleSubmit = async () => {
       <h2>Bienvenue</h2>
         <ion-item>
           <ion-label position="stacked">Nom d'utilisateur</ion-label>
-          <ion-input v-model="username">
+          <ion-input v-model="username"
+                     autocomplete="username">
 
           </ion-input>
         </ion-item>
@@ -68,65 +69,15 @@ const handleSubmit = async () => {
 
         <p v-if="error">{{ error }}</p>
 
-      </form>
-    </ion-content>
-  </ion-page>
-</template>
+        <ion-button fill="clear" router-link="/register">
+          Créer un compte
+        </ion-button>
 
+                </form>
+              </ion-content>
+            </ion-page>
+          </template>
 
-<!--<template>-->
-<!--  <ion-page>-->
-<!--    <ion-header>-->
-<!--      <ion-toolbar>-->
-<!--        <ion-title>Connexion</ion-title>-->
-<!--      </ion-toolbar>-->
-<!--    </ion-header>-->
+<style scoped>
 
-<!--    <ion-content class="ion-padding">-->
-<!--      <form @submit.prevent="handleSubmit">-->
-<!--        <ion-item>-->
-<!--          <ion-label position="stacked">Nom d’utilisateur</ion-label>-->
-<!--          <ion-input-->
-<!--              v-model="username"-->
-<!--              autocomplete="username"-->
-<!--          ></ion-input>-->
-<!--        </ion-item>-->
-
-<!--        <ion-item>-->
-<!--          <ion-label position="stacked">Mot de passe</ion-label>-->
-<!--          <ion-input-->
-<!--              v-model="password"-->
-<!--              type="password"-->
-<!--              autocomplete="current-password"-->
-<!--          ></ion-input>-->
-<!--        </ion-item>-->
-
-<!--        <div class="ion-margin-top">-->
-<!--          <ion-button-->
-<!--              expand="block"-->
-<!--              type="submit"-->
-<!--              :disabled="loading"-->
-<!--          >-->
-<!--            <ion-spinner v-if="loading" name="dots" />-->
-<!--            <span v-else>Se connecter</span>-->
-<!--          </ion-button>-->
-<!--        </div>-->
-
-<!--        <p v-if="error" class="error">{{ error }}</p>-->
-
-<!--        <div class="ion-margin-top">-->
-<!--          <ion-button fill="clear" router-link="/register">-->
-<!--            Créer un compte-->
-<!--          </ion-button>-->
-<!--        </div>-->
-<!--      </form>-->
-<!--    </ion-content>-->
-<!--  </ion-page>-->
-<!--</template>-->
-
-<!--<style scoped>-->
-<!--.error {-->
-<!--  color: red;-->
-<!--  margin-top: 8px;-->
-<!--}-->
-<!--</style>-->
+</style>
