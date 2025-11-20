@@ -116,12 +116,12 @@
           <ion-card-title>{{ aiRecipe.name}}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <p>Durée : {{ aiRecipe.durationMinutes }} min</p>
+          <p>Durée : {{ aiRecipe.durationMinutes}} min</p>
 
           <h3>Ingrédients</h3>
           <ul>
             <li v-for="(ing, idx) in aiRecipe.ingredients" :key="idx">
-              {{ ing.quantity }} {{ ing.unit }} - {{ ing.name }}
+              {{ ing.quantity}} {{ ing.unit }} - {{ ing.name }}
             </li>
           </ul>
 
@@ -181,7 +181,6 @@ import {
 import type { Recipe, IngredientInput } from '@/services/aiAPI';
 
 const { photos, takePhoto } = usePhotoGallery();
-
 const premium = isPremiumUser();
 const loadingAi = ref(false);
 const aiError = ref('');

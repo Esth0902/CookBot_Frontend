@@ -1,5 +1,6 @@
 <template>
   <ion-page>
+    <Header />
     <ion-content class="main-content ion-padding">
       <!-- Section d’introduction -->
       <section class="intro-section">
@@ -84,6 +85,8 @@ import {
   IonRow,
   IonCol
 } from '@ionic/vue';
+
+import Header from "@/components/Header.vue";
 </script>
 
 <style scoped>
