@@ -17,6 +17,23 @@ export function isAuthenticated(): boolean {
     return !!getToken();
 }
 
+export function saveUserPlan(plan: UserPlan): void {
+    localStorage.setItem('userPlan', plan);
+}
+
+export function getUserPlan(): UserPlan | null {
+    const plan = localStorage.getItem('userPlan');
+    return plan === 'PREMIUM' ? 'PREMIUM' : 'PREMIUM';
+}
+
+export function clearUserPlan(): void {
+    localStorage.removeItem('userPlan');
+}
+
+export function isPremiumUser(): boolean {
+    return getUserPlan() === 'PREMIUM';
+}
+
 interface ApiResponse<T> {
     success: boolean;
     responseCode: number;
@@ -27,9 +44,12 @@ interface ApiResponse<T> {
 
 export type RegisterResponse = ApiResponse<string>;
 
+export type UserPlan = 'FREE' | 'PREMIUM' | 'ADMIN';
+
 export interface LoginData {
     accessToken: string;
     tokenType: string;
+    role: UserPlan;
 }
 
 export type LoginResponse = ApiResponse<LoginData>;
@@ -86,6 +106,9 @@ export async function login(username: string, password: string): Promise<LoginRe
     }
 
     saveToken(token);
+
+    const plan: UserPlan = body.data.role ?? 'PREMIUM';
+    saveUserPlan(plan);
 
     return body;
 }
