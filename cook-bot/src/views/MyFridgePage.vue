@@ -113,7 +113,7 @@
       <!-- RECETTE IA -->
       <ion-card v-if="aiRecipe" class="ion-margin">
         <ion-card-header>
-          <ion-card-title>{{ aiRecipe.name }}</ion-card-title>
+          <ion-card-title>{{ aiRecipe.name}}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <p>Durée : {{ aiRecipe.durationMinutes }} min</p>
