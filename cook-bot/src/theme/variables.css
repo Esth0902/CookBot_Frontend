@@ -5,6 +5,7 @@
     --ion-color-light: #F27438;
     --ion-background-color: #26474E; /* Fond */
     --ion-text-color: #ffffff; /* Texte */
+    --font-family-base: 'Poppins', sans-serif;
 }
 
 .logo-header {
@@ -16,4 +17,8 @@
     color: var(--ion-color-tertiary);
     height: 40px;
     width: 40px;
+}
+
+body, ion-app, ion-content, ion-label, ion-title, ion-button {
+    font-family: var(--font-family-base);
 }

@@ -2,7 +2,9 @@
   <ion-header translucent="true">
     <ion-toolbar>
       <ion-buttons slot="start">
-      <img src="/public/LogoCookBot.png" alt="Logo CookBot" class="logo-header"/>
+        <router-link to="/tabs/home" class="logo-link">
+          <img :src="logo" alt="Logo CookBot" class="logo-header"/>
+        </router-link>
       </ion-buttons>
 
       <ion-buttons slot="end">
@@ -20,4 +22,5 @@
 import {personCircleOutline} from "ionicons/icons";
 import {IonIcon} from "@ionic/vue";
 import LogoutButton from "@/components/LogoutButton.vue";
+import logo from '/LogoCookBot.png';
 </script>
