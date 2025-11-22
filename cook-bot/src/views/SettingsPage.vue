@@ -1,5 +1,6 @@
 <template>
   <ion-page>
+    <Header/>
     <ion-header translucent>
       <ion-toolbar>
         <ion-title>Réglages</ion-title>
@@ -112,6 +113,7 @@ import { Preferences } from '@capacitor/preferences'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { add, remove, close, checkmark, alertCircle } from 'ionicons/icons'
 import LogoutButton from "@/components/LogoutButton.vue";
+import Header from "@/components/Header.vue";
 
 const STORAGE_KEY = 'cookbot.settings.v1'
 
