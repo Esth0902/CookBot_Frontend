@@ -30,20 +30,22 @@
             v-if="premium"
             expand="block"
             :disabled="!photos.length || loadingAi"
-            @click="handleGenerateRecipeFromImage"
+            @click="handleGenerateRecipeTitleFromImage"
         >
           <ion-icon :icon="camera" slot="start" />
-          <span v-if="!loadingAi">Générer une recette avec la photo</span>
+          <span v-if="!loadingAi">Générer des idées de recettes avec la photo</span>
           <span v-else>Génération en cours...</span>
         </ion-button>
-
-        <!-- Message pour FREE -->
-        <ion-text v-else color="medium">
-          <p>
-            La génération par photo est disponible pour les comptes PREMIUM 👑.<br />
-            Tu peux utiliser la liste d’ingrédients ci-dessous pour générer une recette.
-          </p>
-        </ion-text>
+        <ion-button
+            v-if="premium"
+            expand="block"
+            :disabled="!photos.length || loadingAi"
+            @click="handleGenerateRecipeFromImage"
+        >
+        <ion-icon :icon="camera" slot="start" />
+        <span v-if="!loadingAi">Générer une recette complète avec la photo</span>
+        <span v-else>Génération en cours...</span>
+        </ion-button>
       </div>
 
       <!-- PARTIE LISTE MANUELLE (FREE + PREMIUM) -->
@@ -97,7 +99,7 @@
               :disabled="loadingAi || manualIngredientsCleaned.length === 0"
               @click="handleGenerateRecipeFromManual"
           >
-            <span v-if="!loadingAi">Générer une recette avec ces ingrédients</span>
+            <span v-if="!loadingAi">Générer des recettes avec ces ingrédients</span>
             <span v-else>Génération en cours...</span>
           </ion-button>
         </ion-card-content>
@@ -109,6 +111,22 @@
           <p>{{ aiError }}</p>
         </ion-text>
       </div>
+
+      <ion-card v-if="aiRecipeTitles && aiRecipeTitles.length" class="ion-margin">
+        <ion-card-header>
+          <ion-card-title>Idées de recettes</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item v-for="(rec, idx) in aiRecipeTitles" :key="idx">
+              <ion-label>
+                <h3>{{ rec.title }}</h3>
+                <p>Durée : {{ rec.durationMinutes }} min</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
 
       <!-- RECETTE IA -->
       <ion-card v-if="aiRecipe" class="ion-margin">
@@ -176,9 +194,9 @@ import LogoutButton from '@/components/LogoutButton.vue';
 import { isPremiumUser } from '@/services/authApi';
 import {
   generateRecipeFromImage,
-  generateRecipeFromIngredients,
+  generateRecipeFromIngredients, generateRecipeTitleFromImage,
 } from '@/services/aiAPI';
-import type { Recipe, IngredientInput } from '@/services/aiAPI';
+import type { Recipe, IngredientInput, RecipeTitle } from '@/services/aiAPI';
 
 const { photos, takePhoto } = usePhotoGallery();
 
@@ -186,6 +204,7 @@ const premium = isPremiumUser();
 const loadingAi = ref(false);
 const aiError = ref('');
 const aiRecipe = ref<Recipe | null>(null);
+const aiRecipeTitles = ref<RecipeTitle[] | null>(null);
 
 const manualIngredients = ref<IngredientInput[]>([
   { name: '', quantity: 0, unit: '' },
@@ -212,9 +231,37 @@ function removeIngredientRow(index: number) {
   }
 }
 
+const handleGenerateRecipeTitleFromImage = async () => {
+  aiError.value = '';
+  aiRecipe.value = null;
+  aiRecipeTitles.value = null;
+
+  if (!photos.value.length) {
+    aiError.value = 'Prends une photo d’abord';
+    return;
+  }
+
+  const photo = photos.value[0];
+
+  loadingAi.value = true;
+  try {
+    const titles = await generateRecipeTitleFromImage(photo);
+    aiRecipeTitles.value = titles;
+  } catch (err) {
+    console.error(err);
+    aiError.value =
+        err instanceof Error
+            ? err.message
+            : 'Erreur lors de la génération des idées de recettes depuis la photo';
+  } finally {
+    loadingAi.value = false;
+  }
+};
+
 const handleGenerateRecipeFromImage = async () => {
   aiError.value = '';
   aiRecipe.value = null;
+  aiRecipeTitles.value = null;
 
   if (!premium) {
     aiError.value = 'La génération par photo est réservée aux comptes PREMIUM.';
@@ -246,6 +293,7 @@ const handleGenerateRecipeFromImage = async () => {
 const handleGenerateRecipeFromManual = async () => {
   aiError.value = '';
   aiRecipe.value = null;
+  aiRecipeTitles.value = null;
 
   const ingredients = manualIngredientsCleaned.value;
 
@@ -256,8 +304,8 @@ const handleGenerateRecipeFromManual = async () => {
 
   loadingAi.value = true;
   try {
-    const recipe = await generateRecipeFromIngredients(ingredients);
-    aiRecipe.value = recipe;
+    const titles = await generateRecipeFromIngredients(ingredients);
+    aiRecipeTitles.value = titles;
   } catch (err) {
     console.error(err);
     aiError.value =
