@@ -15,7 +15,6 @@
         </ion-toolbar>
       </ion-header>
 
-      <!-- PARTIE PHOTO (PREMIUM uniquement + si des photos existent) -->
       <ion-grid v-if="premium && photos.length">
         <ion-row>
           <ion-col size="6" :key="photo.filepath" v-for="photo in photos">
@@ -25,7 +24,6 @@
       </ion-grid>
 
       <div class="ion-padding">
-        <!-- Bouton IA par photo (PREMIUM) -->
         <ion-button
             v-if="premium"
             expand="block"
@@ -48,7 +46,6 @@
         </ion-button>
       </div>
 
-      <!-- PARTIE LISTE MANUELLE (FREE + PREMIUM) -->
       <ion-card class="ion-margin">
         <ion-card-header>
           <ion-card-title>Ingrédients dans mon frigo</ion-card-title>
@@ -105,7 +102,6 @@
         </ion-card-content>
       </ion-card>
 
-      <!-- ERREURS IA -->
       <div class="ion-padding" v-if="aiError">
         <ion-text color="danger">
           <p>{{ aiError }}</p>
@@ -128,7 +124,6 @@
         </ion-card-content>
       </ion-card>
 
-      <!-- RECETTE IA -->
       <ion-card v-if="aiRecipe" class="ion-margin">
         <ion-card-header>
           <ion-card-title>{{ aiRecipe.name}}</ion-card-title>
@@ -152,7 +147,6 @@
         </ion-card-content>
       </ion-card>
 
-      <!-- FAB PHOTO (PREMIUM uniquement) -->
       <ion-fab v-if="premium" vertical="bottom" horizontal="center" slot="fixed">
         <ion-fab-button @click="takePhoto()">
           <ion-icon :icon="camera"></ion-icon>
@@ -186,6 +180,8 @@ import {
   IonCardContent,
   IonItem,
   IonInput,
+  IonList,
+  IonLabel, onIonViewWillEnter,
 } from '@ionic/vue';
 
 import { ref, computed } from 'vue';
@@ -199,7 +195,13 @@ import {
 import type { Recipe, IngredientInput, RecipeTitle } from '@/services/aiAPI';
 
 const { photos, takePhoto } = usePhotoGallery();
-const premium = isPremiumUser();
+const premium = ref(false);
+
+onIonViewWillEnter(() => {
+  premium.value = isPremiumUser();
+  console.log('onIonViewWillEnter – premium =', premium.value);
+});
+
 const loadingAi = ref(false);
 const aiError = ref('');
 const aiRecipe = ref<Recipe | null>(null);
@@ -261,11 +263,6 @@ const handleGenerateRecipeFromImage = async () => {
   aiError.value = '';
   aiRecipe.value = null;
   aiRecipeTitles.value = null;
-
-  if (!premium) {
-    aiError.value = 'La génération par photo est réservée aux comptes PREMIUM.';
-    return;
-  }
 
   if (!photos.value.length) {
     aiError.value = 'Prends une photo d’abord';

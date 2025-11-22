@@ -1,3 +1,5 @@
+import {jwtDecode} from "jwt-decode";
+
 const API_BASE_URL = 'http://localhost:8080';
 const TOKEN_KEY = 'jwtToken';
 
@@ -17,13 +19,18 @@ export function isAuthenticated(): boolean {
     return !!getToken();
 }
 
-export function saveUserPlan(plan: UserPlan): void {
-    localStorage.setItem('userPlan', plan);
-}
-
 export function getUserPlan(): UserPlan | null {
-    const plan = localStorage.getItem('userPlan');
-    return plan === 'PREMIUM' ? 'PREMIUM' : 'PREMIUM';
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) return null;
+
+    try {
+        const decoded = jwtDecode<{ role: UserPlan }>(token);
+        console.log("JWT décodé dans getUserPlan :", decoded);
+        return decoded.role ?? null;   // ← C'est ICI la correction
+    } catch (err) {
+        console.error("Erreur en décodant le token :", err);
+        return null;
+    }
 }
 
 export function clearUserPlan(): void {
@@ -31,7 +38,9 @@ export function clearUserPlan(): void {
 }
 
 export function isPremiumUser(): boolean {
-    return getUserPlan() === 'PREMIUM';
+    const plan = getUserPlan();
+    console.log('isPremiumUser – plan =', plan);
+    return plan === 'PREMIUM';
 }
 
 interface ApiResponse<T> {
@@ -106,9 +115,6 @@ export async function login(username: string, password: string): Promise<LoginRe
     }
 
     saveToken(token);
-
-    const plan: UserPlan = body.data.role ?? 'PREMIUM';
-    saveUserPlan(plan);
 
     return body;
 }
