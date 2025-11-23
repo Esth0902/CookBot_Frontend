@@ -22,3 +22,18 @@
 body, ion-app, ion-content, ion-label, ion-title, ion-button {
     font-family: var(--font-family-base);
 }
+
+.native-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px var(--ion-background-color) inset !important;
+    -webkit-text-fill-color: var(--ion-text-color) !important;
+}
+
+.native-wrapper {
+    overflow: hidden;
+    border-radius: 50px;
+    text-align: center;
+}
+
+.input-wrapper {
+    padding-bottom: 50px;
+}
