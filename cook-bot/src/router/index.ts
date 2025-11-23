@@ -19,6 +19,16 @@ const routes: Array<RouteRecordRaw> = [
         meta: {guestOnly: true}
     },
     {
+        path:'/home',
+        component: () => import ('@/views/DisconnectedHomePage.vue'),
+        meta: {guestOnly: true}
+    },
+    {
+        path:'pricing',
+        component: () => import ('@/views/PricingPage.vue'),
+        meta: {guestOnly: true}
+    },
+    {
         path: '/tabs/',
         component: TabsPage,
         meta: {requiresAuth: true},
@@ -41,7 +51,7 @@ const routes: Array<RouteRecordRaw> = [
         },
         {
             path: 'home',
-            component: () => import('@/views/HomePage.vue')
+            component: () => import('@/views/ConnectedHomePage.vue')
         },
 
         {
@@ -55,6 +65,10 @@ const routes: Array<RouteRecordRaw> = [
         {
             path:'shopping',
             component: () => import('@/views/ShoppingPage.vue')
+        },
+        {
+            path:'pricing',
+            component:() => import('@/views/PricingPage.vue')
         },
         ]
     }
