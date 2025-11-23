@@ -4,9 +4,6 @@ import { useRouter } from 'vue-router';
 import { login } from '@/services/authApi';
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonItem,
   IonLabel,
@@ -40,13 +37,13 @@ const handleSubmit = async () => {
 
 <template>
   <ion-page>
-    <ion-content class="login-content">
+    <ion-content fullscreen class="login-content">
       <div class="login-logo-container">
         <img src="/LogoCookBot.png" alt="Logo" class="login-logo" />
       </div>
 
       <div class="login-card">
-        <h1 class="login-title">Bienvenue</h1>
+        <h1 class="login-title">Connexion à ton espace</h1>
 
         <p v-if="error" class="login-error">{{ error }}</p>
 
@@ -85,7 +82,8 @@ const handleSubmit = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  padding-top: 40px;
+  padding-bottom: 40px;
 }
 
 .login-logo-container {
@@ -93,8 +91,8 @@ const handleSubmit = async () => {
 }
 
 .login-logo {
-  width: 300px;
-  height: auto;
+  width: 70%;
+  max-width: 260px;
 }
 
 .login-card {
@@ -105,6 +103,7 @@ const handleSubmit = async () => {
   max-width: 380px;
   justify-self: center;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  margin: 0 10px;
 }
 
 .login-title {
@@ -135,6 +134,14 @@ const handleSubmit = async () => {
 .login-input-item ion-label {
   font-size: 1.5rem;
   background: transparent;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 360px) {
+  .login-input-item ion-label {
+    font-size: 1.2rem;
+  }
 }
 
 .login-input-item ion-input {
