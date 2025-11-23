@@ -36,6 +36,11 @@
 </template>
 
 <style scoped>
+ion-tab-bar {
+  --color: rgba(255, 255, 255, 0.55);
+  --color-selected: var(--ion-color-primary);
+}
+
 
 </style>
 

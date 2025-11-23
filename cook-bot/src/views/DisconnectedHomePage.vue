@@ -2,7 +2,7 @@
   <ion-page>
     <ion-content fullscreen class="DHP-content">
 
-      <!-- LOGO -->
+      <!-- FIRST SECTION -->
       <section class="DHP-hero">
         <img src="/LogoCookBot.png" alt="CookBot Logo" class="DHP-logo" />
 
@@ -26,7 +26,7 @@
         <img src="/wave.png" alt="wave separator" />
       </div>
 
-      <!-- FEATURES -->
+      <!-- ITEMS -->
       <section class="DHP-items-section">
         <div class="DHP-item">
           <ion-icon :icon="restaurantOutline"></ion-icon>
@@ -78,7 +78,7 @@ import {restaurantOutline, listOutline, flashOutline} from "ionicons/icons";
   text-align: center;
 }
 
-/* HERO */
+/* FIRST SECTION */
 .DHP-hero {
   padding-bottom: 20px;
 }

@@ -6,7 +6,7 @@ import { isAuthenticated } from '@/services/authApi';
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
-        redirect: '/tabs/home'
+        redirect: '/home'
     },
     {
         path: '/login',
@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {guestOnly: true}
     },
     {
-        path:'pricing',
+        path:'/pricing',
         component: () => import ('@/views/PricingPage.vue'),
         meta: {guestOnly: true}
     },
