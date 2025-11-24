@@ -123,6 +123,64 @@ export async function generateRecipeFromIngredients(
     return json.data.recipeTitles;
 }
 
+export async function generateDailyRecipe(): Promise<Recipe> {
+    const response = await authFetch('/api/v1/ai/recipe/daily', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            prompt:
+                `
+                Génère une recette simple, de saison et rapide (10-20 min).
+                Structure strictement en JSON :
+                {
+                    "name": "",
+                    "durationMinutes": 0,
+                    "ingredients": [
+                        { "name": "", "quantity": 0, "unit": "" }
+                    ],
+                    "steps": [
+                        { "stepNumber": 1, "description": "" }
+                    ]
+                }
+                Ne renvoie STRICTEMENT QUE le JSON.
+            `
+        })
+    });
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Erreur lors de la génération de la recette du jour");
+    }
+
+    const json = await response.json() as {
+        success: boolean;
+        responseCode: number;
+        responseMessage: string;
+        data: Recipe;
+    };
+
+    return json.data;
+}
+
+export async function generateChefTip(): Promise<string> {
+    const response = await authFetch('/api/v1/ai/tip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: "Donne une astuce cuisine très simple et utile, en une seule phrase." })
+    });
+
+    const json = await response.json() as {
+        success: boolean;
+        data: { tip: string };
+    };
+
+    return json.data.tip;
+}
+
+
+
 
 
 
