@@ -1,6 +1,6 @@
 <template>
   <section class="pricing-section">
-    <h1 class="pricing-title">Choisis ton abonnement</h1>
+    <h1 class="pricing-title">Avec Premium, c’est moins de prise de tête et beaucoup plus de goût.</h1>
 
     <div class="pricing-grid">
       <!-- Free Plan -->
@@ -59,6 +59,8 @@
   box-shadow: 0 8px 20px rgba(0,0,0,0.25);
   backdrop-filter: blur(6px);
   transition: transform 0.3s ease;
+  border: 1px solid var(--ion-color-primary);
+
 }
 
 .pricing-card:hover {
