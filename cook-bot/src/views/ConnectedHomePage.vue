@@ -66,50 +66,77 @@ const firstTip = computed(() => {
 
       <div v-else>
 
-      <!-- Section de bienvenue -->
-      <section class="home-welcome">
-        <h1>Bonjour {{username}}</h1>
-        <p>Ravi de te revoir ! Prêt(e) à cuisiner quelque chose de délicieux ?
-        </p>
-      </section>
-
-        <div v-if="userRole === 'FREE'" class="home-publicite">
-          <img src="/publicite.png" alt="Publicité CookBot" class="banner" />
-        </div>
-
-      <Pricing v-if="userRole === 'FREE'"/>
-
-      <section v-if="userRole === 'PREMIUM'" class="home-permium">
-
-        <div v-if="dailyRecipe" class="home-recipe">
-          <h2>
-            Recette du jour
-          </h2>
-
-          <div v-if="dailyRecipe" class="home-recipe-card">
-            <h3>
-              {{dailyRecipe.name}}
-            </h3>
-            <p>
-              {{dailyRecipe.durationMinutes}} min
+        <!-- Section de bienvenue -->
+        <section class="home-section">
+          <div class="home-card">
+            <h1 class="home-card-title">Bonjour {{ username }}</h1>
+            <p class="home-card-text">
+              Ravi de te revoir ! Prêt(e) à cuisiner quelque chose de délicieux ?
             </p>
-            <ion-button expand="default" fill="outline">Voir la recette</ion-button>
+          </div>
+
+          <div class="home-separator">
+            <img src="/wave1.png" alt="separator" />
+          </div>
+        </section>
+
+
+
+        <!-- SECTION FREE -->
+        <div v-if="userRole === 'FREE'" class="home-free-section">
+          <img src="/banner.png" alt="Publicité CookBot" class="banner" />
+
+          <div class="home-offer-card">
+            <Pricing />
+          </div>
+
+          <div class="home-separator">
+            <img src="/wave1.png" alt="separator"/>
           </div>
         </div>
 
-          <div v-if="dailyRecipe?.tips" class="home-tips">
-          <h2>Astuces du chef</h2>
-            <p>{{firstTip}}</p>
+
+        <!-- SECTION PREMIUM -->
+        <section v-if="userRole === 'PREMIUM'" class="home-premium">
+
+          <!-- Recette du jour -->
+          <div v-if="dailyRecipe" class="home-section">
+            <div class="home-card">
+              <h2 class="home-card-title">Recette du jour</h2>
+
+              <h3 class="home-card-sub">{{ dailyRecipe.name }}</h3>
+              <p class="home-card-text">{{ dailyRecipe.durationMinutes }} min</p>
+
+              <ion-button
+                  size="small"
+                  fill="outline"
+                  class="home-card-btn"
+              >
+                Voir la recette
+              </ion-button>
+            </div>
+
+            <div class="home-separator">
+              <img src="/wave1.png" alt="separator" />
+            </div>
           </div>
 
-      </section>
+
+          <!-- Astuce du chef -->
+          <div v-if="firstTip" class="home-section">
+            <div class="home-card">
+              <h2 class="home-card-title">Astuce du chef</h2>
+              <p class="home-card-text">{{ firstTip }}</p>
+            </div>
+          </div>
+
+        </section>
+
       </div>
 
     </ion-content>
   </ion-page>
 </template>
-
-
 
 <style scoped>
 .home-content {
@@ -117,12 +144,6 @@ const firstTip = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 26px;
-}
-
-/* SECTION BIENVENUE */
-.home-welcome {
-  text-align: center;
-  margin-top: 10px;
 }
 
 .home-welcome h1 {
@@ -137,33 +158,20 @@ const firstTip = computed(() => {
   color: var(--ion-text-color);
 }
 
-/* PUBLICITÉ */
-.home-publicite {
+.home-free-section {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;   /* centre HORIZONTAL */
+  gap: 20px;             /* espace entre pub et card */
 }
 
 .banner {
-  width: 100%;
-  max-width: 340px;
+  width: min(90%, 450px);
+  display: block;
+  margin: 0 auto;
+  height: auto;
   border-radius: 18px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-/* === RECETTE PREMIUM === */
-.home-recipe {
-  margin-top: 0;
-}
-
-.home-recipe-card {
-  background: var(--ion-background-color-step-100);
-  padding: 22px;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.18);
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
 }
 
 .home-recipe h2 {
@@ -194,14 +202,6 @@ const firstTip = computed(() => {
   align-self: flex-start;
 }
 
-/* === ASTUCES === */
-.home-tips {
-  background: var(--ion-background-color-step-100);
-  padding: 22px;
-  border-radius: 20px;
-  border-left: 6px solid var(--ion-color-secondary);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
 
 .home-tips h2 {
   font-size: 1.45rem;
@@ -216,11 +216,66 @@ const firstTip = computed(() => {
   color: var(--ion-text-color);
 }
 
-/* LOADING */
 .home-loading-container {
   margin-top: 40px;
   text-align: center;
 }
 
+/* SECTION WRAPPER */
+.home-section {
+  padding: 10px 10px;
+}
+
+/* CARD STYLE — comme Pricing */
+.home-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--ion-color-primary);
+  text-align: center;
+  transition: 0.3s;
+}
+
+.home-card:hover {
+  transform: translateY(-4px);
+}
+
+.home-card-title {
+  color: var(--ion-color-light);
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.home-card-sub {
+  color: var(--ion-color-secondary);
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+.home-card-text {
+  color: var(--ion-text-color);
+  font-size: 1rem;
+  margin-bottom: 15px;
+}
+
+.home-card-btn {
+  --border-radius: 10px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  font-size: 0.9rem;
+  width: auto;
+  margin: 0 auto;
+}
+
+.home-separator img {
+  width: 230px;
+  margin: 15px auto 0;
+  display: block;
+}
 
 </style>
