@@ -1,55 +1,50 @@
 <template>
   <ion-page>
     <Header/>
-    <ion-header translucent>
-      <ion-toolbar>
-        <ion-title>Réglages</ion-title>
-        <LogoutButton />
-      </ion-toolbar>
-    </ion-header>
 
-    <ion-content :fullscreen="true">
-      <div class="p-4 space-y-6">
-        <ion-list inset>
-          <ion-list-header>
-            <ion-label>
-              <h2>Préférences de cuisine</h2>
-              <p>Valeurs par défaut utilisées pour les recettes</p>
-            </ion-label>
-          </ion-list-header>
+    <ion-content class="settings-content">
+      <section class="settings-section">
+        <div class="settings-card">
+          <h2 class="settings-card-title">Préférences de cuisine</h2>
+          <p class="settings-card-text">Valeurs par défaut utilisées pour les recettes</p>
 
-          <ion-item lines="full">
-            <ion-label>Nombre de personnes</ion-label>
-            <div class="flex items-center gap-2">
-              <ion-button @click="decServings" size="small" aria-label="Diminuer">
+          <div class="settings-row">
+            <span>Nombre de personnes</span>
+
+            <div class="settings-counter">
+              <ion-button @click="decServings" size="small">
                 <ion-icon :icon="remove" />
               </ion-button>
-              <ion-badge color="light">
-                {{ settings.servings }}
-              </ion-badge>
-              <ion-button @click="incServings" size="small" aria-label="Augmenter">
+
+              <ion-badge color="light">{{ settings.servings }}</ion-badge>
+
+              <ion-button @click="incServings" size="small">
                 <ion-icon :icon="add" />
               </ion-button>
+
             </div>
-          </ion-item>
+          </div>
 
-          <ion-item>
-            <ion-label>Filtrer les résultats avec mes exclusions</ion-label>
-            <ion-toggle :checked="settings.applyFiltersInSearch" @ionChange="toggleApplyFilters" />
-          </ion-item>
-        </ion-list>
+          <div class="settings-row">
+            <span>Filtrer les résultats avec mes exclusions</span>
+            <ion-toggle
+                :checked="settings.applyFiltersInSearch"
+                @ionChange="toggleApplyFilters"
+            />
+          </div>
+        </div>
+      </section>
 
-        <ion-list inset>
-          <ion-list-header>
-            <ion-label>
-              <h2>Aliments à éviter</h2>
-            </ion-label>
-          </ion-list-header>
+      <!-- SEPARATEUR -->
+      <div class="settings-separator">
+        <img src="/wave.png" alt="separator" />
+      </div>
 
-          <ion-item>
-            <ion-label>Allergènes (liste rapide)</ion-label>
-          </ion-item>
-          <div class="px-4 pb-2 flex flex-wrap gap-2">
+      <section class="settings-section">
+        <div class="settings-card">
+          <h2 class="settings-card-title">Aliments à éviter</h2>
+
+          <div class="settings-chips">
             <ion-chip
                 v-for="a in commonAllergens"
                 :key="a"
@@ -61,20 +56,17 @@
             </ion-chip>
           </div>
 
-          <ion-item lines="full">
-            <ion-label position="stacked">Liste personnalisée</ion-label>
-            <div class="w-full flex gap-2 items-end">
-              <ion-input
-                  v-model="newAvoid"
-                  placeholder="ex: coriandre, champignons..."
-                  @keyup.enter="addAvoid"
-                  :clear-input="true"
-              />
-              <ion-button @click="addAvoid" :disabled="!newAvoid.trim()">Ajouter</ion-button>
-            </div>
-          </ion-item>
+          <div class="settings-input-row">
+            <ion-input
+                v-model="newAvoid"
+                placeholder="ex: coriandre, champignons..."
+                @keyup.enter="addAvoid"
+                :clear-input="true"
+            />
+            <ion-button @click="addAvoid" :disabled="!newAvoid.trim()">Ajouter</ion-button>
+          </div>
 
-          <div v-if="settings.avoidList.length" class="px-4 pt-2 pb-4 flex flex-wrap gap-2">
+          <div v-if="settings.avoidList.length" class="settings-chips">
             <ion-chip
                 v-for="(item, i) in settings.avoidList"
                 :key="item"
@@ -85,16 +77,20 @@
               <ion-icon :icon="close" />
             </ion-chip>
           </div>
-        </ion-list>
+        </div>
+      </section>
 
-        <div class="px-4 flex gap-3">
-          <ion-button expand="block" class="flex-1" @click="saveNow" :disabled="!dirty">Enregistrer</ion-button>
-          <ion-button expand="block" class="flex-1" color="medium" fill="outline" @click="resetAll">
+      <section class="settings-section" style="padding-bottom: 30px;">
+        <div class="settings-buttons">
+          <ion-button expand="block" class="settings-btn-save" @click="saveNow" >
+            Enregistrer
+          </ion-button>
+
+          <ion-button expand="block"  class="settings-btn-reset" @click="resetAll">
             Réinitialiser
           </ion-button>
         </div>
-
-      </div>
+      </section>
 
       <ion-toast
           :is-open="toast.open"
@@ -236,7 +232,133 @@ onMounted(loadSettings)
 </script>
 
 <style scoped>
-:deep(.chip-disabled) {
-  opacity: 0.6;
+
+/* Structure générale */
+.settings-content {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
 }
+
+/* Bloc de section (mêmes marges que home-section) */
+.settings-section {
+  padding: 10px 10px;
+}
+
+/* Card glassmorphism */
+.settings-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--ion-color-primary);
+  text-align: center;
+  transition: 0.3s;
+}
+
+.settings-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Titres */
+.settings-card-title {
+  color: var(--ion-color-light);
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Description */
+.settings-card-text {
+  color: var(--ion-text-color);
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+/* Ligne paramètre (row entre label + composants) */
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px 0;
+  color: var(--ion-text-color);
+  font-size: 1rem;
+  text-align: left;
+}
+
+/* Compteur + boutons + badge */
+.settings-counter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-counter ion-badge {
+  background: var(--ion-color-secondary);
+  color: white;
+  padding: 6px 10px;
+  font-size: 1rem;
+  border-radius: 10px;
+}
+
+/* Input + bouton "Ajouter" */
+.settings-input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+
+/* Chips listes */
+.settings-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+/* Séparateur */
+.settings-separator img {
+  width: 160px;
+  margin: 20px auto;
+  display: block;
+  opacity: 0.8;
+}
+
+/* Boutons Enregistrer / Réinitialiser */
+.settings-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.settings-btn-save {
+    --background: var(--ion-color-primary);
+    --border-radius: 12px;
+    --color: var(--ion-color-secondary);
+    width: 100%;
+    max-width: 300px;
+    margin: 12px auto 0;
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Bouton Réinitialiser : outline mais lumineux */
+.settings-btn-reset {
+  --background: var(--ion-color-secondary);
+  --border-radius: 12px;
+  --color: var(--ion-text-color);
+  width: 100%;
+  max-width: 300px;
+  margin: 10px auto 0;
+  display: block;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+
+
 </style>
