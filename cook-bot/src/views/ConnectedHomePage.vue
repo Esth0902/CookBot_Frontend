@@ -11,7 +11,7 @@ import { jwtDecode} from "jwt-decode";
 import {computed, onMounted, ref} from "vue";
 import Pricing from "@/components/Pricing.vue";
 import {generateDailyRecipe} from "@/services/aiAPI";
-import type {Recipe} from "@/types/Recipe";
+import type {Recipe} from '@/types/Recipe';
 
 const username = ref("Utilisateur");
 const token = getToken();
@@ -47,7 +47,7 @@ const firstTip = computed(() => {
   const firstGroup = dailyRecipe.value.tips[0];
   if (!firstGroup?.tips?.length) return null;
 
-  return firstGroup.tips[0]; // 👉 la toute première astuce
+  return firstGroup.tips[0];
 });
 
 
@@ -93,7 +93,7 @@ const firstTip = computed(() => {
             <p>
               {{dailyRecipe.durationMinutes}} min
             </p>
-            <ion-button expand="block" fill="outline">Voir la recette</ion-button>
+            <ion-button expand="default" fill="outline">Voir la recette</ion-button>
           </div>
         </div>
 
@@ -113,73 +113,114 @@ const firstTip = computed(() => {
 
 <style scoped>
 .home-content {
-  padding: 20px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
 }
 
-.home-loading-container {
-  text-align: center;
-  margin-top: 40px;
-}
-
+/* SECTION BIENVENUE */
 .home-welcome {
-  margin-bottom: 25px;
+  text-align: center;
+  margin-top: 10px;
 }
 
 .home-welcome h1 {
-  font-size: 24px;
-  font-weight: bold;
-}
-.home-welcome p {
-  color: #6666;
-}
-
-.home-publicite {
-  width: 100%;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.banner {
-  width: 250%;
-  max-width: 300px;
-  height: auto;
-  display: block;
-}
-
-.home-recipe {
-  margin-top: 20px;
-}
-
-.home-recipe h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-.home-recipe-card {
-  background:#fff;
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.home-recipe-card h3 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--ion-color-light);
   margin-bottom: 6px;
 }
 
+.home-welcome p {
+  font-size: 1.05rem;
+  color: var(--ion-text-color);
+}
+
+/* PUBLICITÉ */
+.home-publicite {
+  display: flex;
+  justify-content: center;
+}
+
+.banner {
+  width: 100%;
+  max-width: 340px;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* === RECETTE PREMIUM === */
+.home-recipe {
+  margin-top: 0;
+}
+
+.home-recipe-card {
+  background: var(--ion-background-color-step-100);
+  padding: 22px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.home-recipe h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ion-color-light);
+  margin-bottom: 12px;
+}
+
+.home-recipe-card h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--ion-color-light);
+  margin: 0;
+}
+
+.home-recipe-card p {
+  color: var(--ion-text-color);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.home-recipe-card ion-button {
+  --background: var(--ion-color-primary);
+  --border-radius: 12px;
+  width: fit-content;   /* bouton non full width */
+  padding: 0 20px;
+  align-self: flex-start;
+}
+
+/* === ASTUCES === */
 .home-tips {
-  background: #fdf7e3;
-  border-left: 4px solid #f5c400;
-  padding: 16px;
-  border-radius: 8px;
-  margin-top: 25px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  background: var(--ion-background-color-step-100);
+  padding: 22px;
+  border-radius: 20px;
+  border-left: 6px solid var(--ion-color-secondary);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
 .home-tips h2 {
-  margin-bottom: 8px;
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: var(--ion-color-light);
+  margin-bottom: 12px;
 }
+
+.home-tips p {
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: var(--ion-text-color);
+}
+
+/* LOADING */
+.home-loading-container {
+  margin-top: 40px;
+  text-align: center;
+}
+
 
 </style>
