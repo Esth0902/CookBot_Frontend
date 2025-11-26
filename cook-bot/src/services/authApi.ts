@@ -26,7 +26,7 @@ export function getUserPlan(): UserPlan | null {
     try {
         const decoded = jwtDecode<{ role: UserPlan }>(token);
         console.log("JWT décodé dans getUserPlan :", decoded);
-        return decoded.role ?? null;   // ← C'est ICI la correction
+        return decoded.role ?? null;
     } catch (err) {
         console.error("Erreur en décodant le token :", err);
         return null;

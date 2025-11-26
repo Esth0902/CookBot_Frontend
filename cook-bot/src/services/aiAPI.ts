@@ -39,61 +39,59 @@ async function userPhotoToBlob(photo: UserPhoto): Promise<Blob> {
     return response.blob();
 }
 
-export async function generateRecipeFromImage(photo: UserPhoto): Promise<Recipe> {
-    const blob = await userPhotoToBlob(photo);
+async function handleJsonResponse<T>(response: Response, defaultError: string): Promise<T> {
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || defaultError);
+    }
+    return response.json() as Promise<T>;
+}
 
+async function handleBlobFormRequest<T>(
+    url: string,
+    photo: UserPhoto,
+    defaultError: string,
+): Promise<T> {
+    const blob = await userPhotoToBlob(photo);
     const formData = new FormData();
     formData.append('file', blob, photo.filepath ?? 'photo.jpg');
 
-    const response = await authFetch('/api/v1/ai/recipe/image', {
+    const response = await authFetch(url, {
         method: 'POST',
         body: formData,
     });
 
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || 'Erreur lors de la génération de la recette depuis la photo');
-    }
+    return handleJsonResponse<T>(response, defaultError);
+}
 
-    const json = await response.json() as {
+export async function generateRecipeFromImage(photo: UserPhoto): Promise<Recipe> {
+    const json = await handleBlobFormRequest<{
         success: boolean;
         responseCode: number;
         responseMessage: string;
         data: Recipe;
-    };
+    }>('/api/v1/ai/recipe/image', photo, 'Erreur lors de la génération de la recette depuis la photo');
 
     return json.data;
 }
-
 export async function generateRecipeTitleFromImage(photo: UserPhoto): Promise<RecipeTitle[]> {
-    const blob = await userPhotoToBlob(photo);
-
-    const formData = new FormData();
-    formData.append('file', blob, photo.filepath ?? 'photo.jpg');
-
-    const response = await authFetch('/api/v1/ai/recipeTitle/image', {
-        method: 'POST',
-        body: formData,
-    });
-
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || 'Erreur lors de la génération de la recette depuis la photo');
-    }
-
-    const json = await response.json() as {
+    const json = await handleBlobFormRequest<{
         success: boolean;
         responseCode: number;
         responseMessage: string;
         data: {
             recipeTitles: RecipeTitle[];
         };
-    };
+    }>(
+        '/api/v1/ai/recipeTitle/image',
+            photo,
+        'Erreur lors de la génération de la recette depuis la photo'
+        );
 
     return json.data.recipeTitles;
 }
 
-export async function generateRecipeFromIngredients(
+export async function generateRecipeTitleFromIngredients(
     ingredients: IngredientInput[],
 ): Promise<RecipeTitle[]> {
     const response = await authFetch('/api/v1/ai/recipeTitle', {
@@ -104,21 +102,17 @@ export async function generateRecipeFromIngredients(
         body: JSON.stringify({ ingredients }),
     });
 
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(
-            text || 'Erreur lors de la génération de la recette depuis les ingrédients',
-        );
-    }
-
-    const json = await response.json() as {
+    const json = await handleJsonResponse<{
         success: boolean;
         responseCode: number;
         responseMessage: string;
         data: {
             recipeTitles: RecipeTitle[];
         };
-    };
+    }>(
+        response,
+        'Erreur lors de la génération de la recette depuis les ingrédients'
+    );
 
     return json.data.recipeTitles;
 }
@@ -143,8 +137,29 @@ export async function generateDailyRecipe(): Promise<Recipe> {
     return json.data;
 }
 
+export async function generateRecipeFromIngredients(
+    ingredients: IngredientInput[],
+): Promise<Recipe> {
+    const response = await authFetch('/api/v1/ai/recipe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ingredients }),
+    });
 
+    const json = await handleJsonResponse<{
+        success: boolean;
+        responseCode: number;
+        responseMessage: string;
+        data: Recipe;
+    }>(
+        response,
+        'Erreur lors de la génération de la recette depuis les ingrédients',
+    );
 
+    return json.data;
+}
 
 
 
