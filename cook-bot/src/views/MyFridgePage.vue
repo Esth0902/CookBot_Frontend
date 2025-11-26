@@ -1,11 +1,6 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>CookBot</ion-title>
-        <LogoutButton />
-      </ion-toolbar>
-    </ion-header>
+    <Header />
 
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
@@ -98,10 +93,11 @@ import LogoutButton from '@/components/LogoutButton.vue';
 import { isPremiumUser } from '@/services/authApi';
 import { useAiRecipes } from '@/composables/useAiRecipes';
 import AiRecipeResult from "@/components/AiRecipeResult.vue";
+import Header from "@/components/Header.vue";
 
 const { photos, takePhoto } = usePhotoGallery();
-const premium = ref(false);
 
+const premium = ref(false);
 onIonViewWillEnter(() => {
   premium.value = isPremiumUser();
   console.log('onIonViewWillEnter – premium =', premium.value);

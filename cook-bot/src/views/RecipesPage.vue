@@ -1,11 +1,6 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>CookBot</ion-title>
-        <LogoutButton />
-      </ion-toolbar>
-    </ion-header>
+    <Header />
 
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
@@ -68,18 +63,19 @@
           <span v-if="!loadingAi">Générer des idées de recettes</span>
           <span v-else>Génération en cours...</span>
         </ion-button>
+        <ion-button
+            expand="block"
+            class="ion-margin-top"
+            :disabled="loadingAi || manualIngredientsCleaned.length === 0"
+            @click="handleGenerateRecipeFromManual"
+        >
+          <span v-if="!loadingAi">Générer une recette complète</span>
+          <span v-else>Génération en cours...</span>
+        </ion-button>
       </ion-card-content>
     </ion-card>
 
-      <ion-button
-          expand="block"
-          class="ion-margin-top"
-          :disabled="loadingAi || manualIngredientsCleaned.length === 0"
-          @click="handleGenerateRecipeFromManual"
-      >
-        <span v-if="!loadingAi">Générer une recette complète</span>
-        <span v-else>Génération en cours...</span>
-      </ion-button>
+
 
 
 
@@ -105,6 +101,7 @@ import LogoutButton from '@/components/LogoutButton.vue';
 import type { IngredientInput } from '@/services/aiAPI';
 import { useAiRecipes } from '@/composables/useAiRecipes';
 import AiRecipeResult from "@/components/AiRecipeResult.vue";
+import Header from "@/components/Header.vue";
 
 const {
   loadingAi,
@@ -114,12 +111,6 @@ const {
   getTitlesFromIngredients,
   getRecipeFromIngredients,
 } = useAiRecipes();
-
-const recipeTitleInput = ref('');
-
-const handleGenerateRecipeFromTitle = () => {
-  getRecipeFromIngredientsOrTitle(recipeTitleInput.value);
-};
 
 
 const manualIngredients = ref<IngredientInput[]>([
