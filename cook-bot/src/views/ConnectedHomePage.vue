@@ -12,6 +12,7 @@ import {computed, onMounted, ref} from "vue";
 import Pricing from "@/components/Pricing.vue";
 import {generateDailyRecipe} from "@/services/aiAPI";
 import type {Recipe} from '@/types/Recipe';
+import AiRecipeResult from '@/components/AiRecipeResult';
 
 const username = ref("Utilisateur");
 const token = getToken();
@@ -104,8 +105,17 @@ const firstTip = computed(() => {
             <div class="home-card">
               <h2 class="home-card-title">Recette du jour</h2>
 
+              <AiRecipeResult
+              :ai-error="dailyRecipe"
+              :ai-recipe="dailyRecipe"
+              :ai-recipe-titles="dailyRecipe.name"
+              />
+
               <h3 class="home-card-sub">{{ dailyRecipe.name }}</h3>
               <p class="home-card-text">{{ dailyRecipe.durationMinutes }} min</p>
+              <p>{{dailyRecipe.ingredients}}</p>
+              <p>{{dailyRecipe.steps}}</p>
+
 
               <ion-button
                   size="small"
