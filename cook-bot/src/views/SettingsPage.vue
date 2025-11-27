@@ -48,34 +48,32 @@
             <ion-chip
                 v-for="a in commonAllergens"
                 :key="a"
-                :color="settings.allergens.includes(a) ? 'danger' : undefined"
+                :color="settings.allergens.includes(a) ? 'success' : 'light'"
                 @click="toggleAllergen(a)"
             >
               <ion-icon :icon="settings.allergens.includes(a) ? checkmark : alertCircle" />
               <ion-label>{{ a }}</ion-label>
             </ion-chip>
           </div>
-
-          <div class="settings-input-row">
+          <div v-if="settings.avoidList.length" class="settings-chips">
+            <ion-chip
+                v-for="(item, i) in settings.avoidList"
+                :key="item"
+                @click="removeAvoid(i)"
+                color="warning"
+            >
+              <ion-label>{{ item }}</ion-label>
+              <ion-icon :icon="close" />
+            </ion-chip>
+          </div>
+          <div class="settings-input-column">
             <ion-input
                 v-model="newAvoid"
                 placeholder="ex: coriandre, champignons..."
                 @keyup.enter="addAvoid"
                 :clear-input="true"
             />
-            <ion-button @click="addAvoid" :disabled="!newAvoid.trim()">Ajouter</ion-button>
-          </div>
-
-          <div v-if="settings.avoidList.length" class="settings-chips">
-            <ion-chip
-                v-for="(item, i) in settings.avoidList"
-                :key="item"
-                @click="removeAvoid(i)"
-                color="medium"
-            >
-              <ion-label>{{ item }}</ion-label>
-              <ion-icon :icon="close" />
-            </ion-chip>
+            <ion-button @click="addAvoid" :disabled="!newAvoid.trim()" class="settings-btn-add">Ajouter</ion-button>
           </div>
         </div>
       </section>
@@ -233,7 +231,6 @@ onMounted(loadSettings)
 
 <style scoped>
 
-/* Structure générale */
 .settings-content {
   padding: 22px;
   display: flex;
@@ -241,12 +238,10 @@ onMounted(loadSettings)
   gap: 26px;
 }
 
-/* Bloc de section (mêmes marges que home-section) */
 .settings-section {
   padding: 10px 10px;
 }
 
-/* Card glassmorphism */
 .settings-card {
   background: rgba(255, 255, 255, 0.05);
   padding: 25px;
@@ -262,7 +257,6 @@ onMounted(loadSettings)
   transform: translateY(-4px);
 }
 
-/* Titres */
 .settings-card-title {
   color: var(--ion-color-light);
   font-size: 1.6rem;
@@ -270,14 +264,12 @@ onMounted(loadSettings)
   font-weight: 600;
 }
 
-/* Description */
 .settings-card-text {
   color: var(--ion-text-color);
   font-size: 1rem;
   margin-bottom: 20px;
 }
 
-/* Ligne paramètre (row entre label + composants) */
 .settings-row {
   display: flex;
   justify-content: space-between;
@@ -288,7 +280,6 @@ onMounted(loadSettings)
   text-align: left;
 }
 
-/* Compteur + boutons + badge */
 .settings-counter {
   display: flex;
   align-items: center;
@@ -303,15 +294,13 @@ onMounted(loadSettings)
   border-radius: 10px;
 }
 
-/* Input + bouton "Ajouter" */
-.settings-input-row {
+.settings-input-column {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-top: 18px;
 }
 
-
-/* Chips listes */
 .settings-chips {
   display: flex;
   flex-wrap: wrap;
@@ -320,7 +309,6 @@ onMounted(loadSettings)
   justify-content: center;
 }
 
-/* Séparateur */
 .settings-separator img {
   width: 160px;
   margin: 20px auto;
@@ -328,14 +316,13 @@ onMounted(loadSettings)
   opacity: 0.8;
 }
 
-/* Boutons Enregistrer / Réinitialiser */
 .settings-buttons {
   display: flex;
   gap: 12px;
 }
 
 .settings-btn-save {
-    --background: var(--ion-color-primary);
+    --background: var(--ion-color-tertiary);
     --border-radius: 12px;
     --color: var(--ion-color-secondary);
     width: 100%;
@@ -346,7 +333,6 @@ onMounted(loadSettings)
     font-size: 1rem;
 }
 
-/* Bouton Réinitialiser : outline mais lumineux */
 .settings-btn-reset {
   --background: var(--ion-color-secondary);
   --border-radius: 12px;
@@ -359,6 +345,16 @@ onMounted(loadSettings)
   font-size: 1rem;
 }
 
-
+.settings-btn-add {
+  --background: var(--ion-color-light);
+  --border-radius: 12px;
+  --color: var(--ion-text-color);
+  width: 100%;
+  max-width: 300px;
+  margin: 10px auto 0;
+  display: block;
+  font-weight: 600;
+  font-size: 1rem;
+}
 
 </style>
