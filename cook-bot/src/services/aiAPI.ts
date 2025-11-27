@@ -145,7 +145,7 @@ export async function generateRecipeFromIngredients(
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ingredients }),
+        body: JSON.stringify({ingredients}),
     });
 
     const json = await handleJsonResponse<{
