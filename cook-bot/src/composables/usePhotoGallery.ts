@@ -1,7 +1,5 @@
 import { ref, onMounted, watch } from 'vue';
 import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Preferences } from '@capacitor/preferences';
 
 export const usePhotoGallery = () => {
     const photos = ref<UserPhoto[]>([]);
@@ -20,9 +18,18 @@ export const usePhotoGallery = () => {
         photos.value = [savedFileImage, ...photos.value];
     };
 
+    const deletePhoto = (photoToDelete?: UserPhoto) => {
+        if (photoToDelete) {
+            photos.value = photos.value.filter(p => p.filepath !== photoToDelete.filepath);
+        } else {
+            photos.value = [];
+        }
+    };
+
     return {
         takePhoto,
-        photos
+        photos,
+        deletePhoto,
     };
 };
 
