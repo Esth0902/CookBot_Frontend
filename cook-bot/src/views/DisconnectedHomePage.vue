@@ -51,16 +51,6 @@
         <img src="/wave.png" alt="wave separator" />
       </div>
 
-      <!-- PRICING -->
-      <section class="DHP-pricing-section">
-        <h2>Choisis ton plan</h2>
-        <p>Simple. Flexible. Transparent.</p>
-
-        <ion-button router-link="/tabs/pricing" class="DHP-pricing-btn">
-          Voir les offres
-        </ion-button>
-      </section>
-
     </ion-content>
   </ion-page>
 </template>

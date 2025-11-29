@@ -12,13 +12,13 @@ import {computed, onMounted, ref} from "vue";
 import Pricing from "@/components/Pricing.vue";
 import {generateDailyRecipe} from "@/services/aiAPI";
 import type {Recipe} from '@/types/Recipe';
-import AiRecipeResult from '@/components/AiRecipeResult';
 
 const username = ref("Utilisateur");
 const token = getToken();
 const userRole = getUserPlan();
 const dailyRecipe = ref<Recipe | null>(null);
 const loading = ref(true);
+const generatingRecipe = ref(false);
 
 if (token) {
   try {
@@ -30,15 +30,6 @@ if (token) {
 }
 
 onMounted(async () => {
-  loading.value = true;
-  if (userRole === 'PREMIUM') {
-    try {
-      dailyRecipe.value = await generateDailyRecipe();
-    }
-    catch (e) {
-      console.error('Erreur de la génération de la recette quotidienne : ', e)
-  }
-}
   loading.value = false;
 });
 
@@ -51,6 +42,18 @@ const firstTip = computed(() => {
   return firstGroup.tips[0];
 });
 
+const generateRecipeOnDemand = async () => {
+  generatingRecipe.value = true;
+
+  try {
+    dailyRecipe.value = await generateDailyRecipe();
+  } catch (e) {
+    console.error("Erreur génération :", e);
+  }
+
+  generatingRecipe.value = false;
+};
+
 
 
 </script>
@@ -59,13 +62,6 @@ const firstTip = computed(() => {
   <ion-page>
     <Header />
     <ion-content class="home-content">
-
-      <div v-if="loading" class="home-loading-container">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Génération de ta recette...</p>
-      </div>
-
-      <div v-else>
 
         <!-- Section de bienvenue -->
         <section class="home-section">
@@ -80,7 +76,6 @@ const firstTip = computed(() => {
             <img src="/wave1.png" alt="separator" />
           </div>
         </section>
-
 
 
         <!-- SECTION FREE -->
@@ -101,48 +96,73 @@ const firstTip = computed(() => {
         <section v-if="userRole === 'PREMIUM'" class="home-premium">
 
           <!-- Recette du jour -->
-          <div v-if="dailyRecipe" class="home-section">
+          <div class="home-section">
             <div class="home-card">
               <h2 class="home-card-title">Recette du jour</h2>
 
-              <AiRecipeResult
-              :ai-error="dailyRecipe"
-              :ai-recipe="dailyRecipe"
-              :ai-recipe-titles="dailyRecipe.name"
-              />
+              <div v-if="!dailyRecipe && !generatingRecipe">
+                <p class="home-card-text">
+                Clique ci-dessous pour découvrir ta recette du jour
+              </p>
+
+                <ion-button
+                    size="small"
+                    fill="outline"
+                    class="home-card-btn"
+                    @click="generateRecipeOnDemand"
+                >
+                  Générer ma recette
+                </ion-button>
+              </div>
+
+          <!-- ÉTAT 2 : Chargement -->
+          <div v-if="generatingRecipe" class="home-card-loading">
+            <ion-spinner name="crescent"></ion-spinner>
+            <p>Génération en cours...</p>
+          </div>
+
+          <!-- ÉTAT 3 : Recette générée -->
+          <div v-if="dailyRecipe && !generatingRecipe" class="home-card-content fade-in">
 
               <h3 class="home-card-sub">{{ dailyRecipe.name }}</h3>
               <p class="home-card-text">{{ dailyRecipe.durationMinutes }} min</p>
-              <p>{{dailyRecipe.ingredients}}</p>
-              <p>{{dailyRecipe.steps}}</p>
+            <div class="recipe-section">
+              <h4 class="recipe-title">Ingrédients</h4>
 
+              <ul class="recipe-list">
+                <li v-for="(ing, index) in dailyRecipe.ingredients" :key="index">
+                  <span class="ing-qty">{{ ing.quantity }} {{ ing.unit }}</span>
+                  <span class="ing-name">{{ ing.name }}</span>
+                </li>
+              </ul>
+            </div>
 
-              <ion-button
-                  size="small"
-                  fill="outline"
-                  class="home-card-btn"
-              >
-                Voir la recette
-              </ion-button>
+            <!-- ÉTAPES -->
+            <div class="recipe-section">
+              <h4 class="recipe-title">Étapes</h4>
+
+              <ol class="recipe-steps">
+                <li v-for="(step, index) in dailyRecipe.steps" :key="index">
+                  {{ step.description }}
+                </li>
+              </ol>
+            </div>
+            </div>
             </div>
 
             <div class="home-separator">
               <img src="/wave1.png" alt="separator" />
             </div>
-          </div>
-
 
           <!-- Astuce du chef -->
           <div v-if="firstTip" class="home-section">
             <div class="home-card">
-              <h2 class="home-card-title">Astuce du chef</h2>
+              <h2 class="home-card-title">L'astuce du chef</h2>
               <p class="home-card-text">{{ firstTip }}</p>
             </div>
           </div>
-
+          </div>
         </section>
-
-      </div>
 
     </ion-content>
   </ion-page>
@@ -226,17 +246,11 @@ const firstTip = computed(() => {
   color: var(--ion-text-color);
 }
 
-.home-loading-container {
-  margin-top: 40px;
-  text-align: center;
-}
 
-/* SECTION WRAPPER */
 .home-section {
   padding: 10px 10px;
 }
 
-/* CARD STYLE — comme Pricing */
 .home-card {
   background: rgba(255, 255, 255, 0.05);
   padding: 25px;
@@ -287,5 +301,72 @@ const firstTip = computed(() => {
   margin: 15px auto 0;
   display: block;
 }
+
+.recipe-section {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.recipe-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 8px;
+  text-align: left;
+  color: var(--ion-color-secondary);
+}
+
+.recipe-list{
+  padding-left: 0;
+  margin: 0;
+}
+.recipe-steps {
+  padding-left: 16px;
+}
+
+.recipe-list li {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  list-style: none;
+  font-size: 0.95rem;
+}
+
+.recipe-steps li {
+  margin: 8px 0;
+  line-height: 1.45;
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeSlideUp 0.6s ease forwards;
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 900px) {
+  .home-card-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    text-align: center;
+  }
+
+  .home-card-sub,
+  .home-card-text {
+    grid-column: 1 / -1;
+  }
+}
+
 
 </style>

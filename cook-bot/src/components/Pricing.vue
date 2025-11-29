@@ -3,35 +3,46 @@
     <h1 class="pricing-title">Avec Premium, c’est moins de prise de tête et beaucoup plus de goût.</h1>
 
     <div class="pricing-grid">
-      <!-- Free Plan -->
+
+      <!-- FREE PLAN -->
       <div class="pricing-card">
         <h2 class="plan-title">Gratuit</h2>
         <p class="plan-price">0€<span>/mois</span></p>
+
         <ul class="plan-features">
-          <li>Accès de base</li>
-          <li>5 recettes / jour</li>
-          <li>Support standard</li>
+          <li>Une nouvelle recette par jour</li>
+          <li>Gestion de vos favoris</li>
+          <li>Liste de courses disponible</li>
+          <li>Fonctionnalités limitées</li>
         </ul>
-        <button class="plan-button">Commencer</button>
+
       </div>
 
-      <!-- Premium Plan -->
       <div class="pricing-card premium">
         <h2 class="plan-title">Premium</h2>
-        <p class="plan-price">7,99€<span>/mois</span></p>
+        <p class="plan-price">5,99€<span>/mois</span></p>
+
         <ul class="plan-features">
           <li>Recettes illimitées</li>
-          <li>Génération avancée</li>
-          <li>Support prioritaire</li>
+          <li>Génération de recettes depuis une photo de ton frigo</li>
+          <li>Suggestions de saison</li>
+          <li>Astuces du chef</li>
+          <li>Personnalisation complète</li>
+          <li>Accès aux favoris</li>
+          <li>Accès à la liste de courses</li>
         </ul>
-        <button class="plan-button premium-btn">Obtenir Premium</button>
+
+        <button class="plan-button premium-btn">
+          Essayer gratuitement durant 5 jours
+        </button>
       </div>
+
     </div>
   </section>
 </template>
 
+
 <script setup>
-// Aucun JS nécessaire pour ce composant statique
 </script>
 
 <style scoped>
