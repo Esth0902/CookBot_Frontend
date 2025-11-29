@@ -3,34 +3,41 @@ import {
   IonPage,
   IonContent,
   IonSpinner,
+  onIonViewWillEnter,
 } from '@ionic/vue';
 
 import Header from "@/components/Header.vue";
 import {getToken, getUserPlan} from "@/services/authApi";
 import { jwtDecode} from "jwt-decode";
-import {computed, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import Pricing from "@/components/Pricing.vue";
 import {generateDailyRecipe} from "@/services/aiAPI";
 import type {Recipe} from '@/types/Recipe';
 
+const userRole = ref("FREE");
 const username = ref("Utilisateur");
-const token = getToken();
-const userRole = getUserPlan();
 const dailyRecipe = ref<Recipe | null>(null);
-const loading = ref(true);
 const generatingRecipe = ref(false);
 
-if (token) {
-  try {
-    const decoded: any = jwtDecode(token);
-    if (decoded?.sub) username.value = decoded.sub;
-  } catch {
-    console.error("Token invalide");
-  }
-}
+const loadUserData = async () => {
 
-onMounted(async () => {
-  loading.value = false;
+  const token = getToken();
+  const plan = getUserPlan();
+
+  if (token) {
+    try {
+      const decoded: any = jwtDecode(token);
+      if (decoded?.sub) username.value = decoded.sub;
+    } catch {
+      console.error("Token invalide");
+    }
+  }
+
+  userRole.value = plan ?? "FREE";
+};
+
+onIonViewWillEnter(() => {
+  loadUserData();
 });
 
 const firstTip = computed(() => {
@@ -53,8 +60,6 @@ const generateRecipeOnDemand = async () => {
 
   generatingRecipe.value = false;
 };
-
-
 
 </script>
 
@@ -176,18 +181,6 @@ const generateRecipeOnDemand = async () => {
   gap: 26px;
 }
 
-.home-welcome h1 {
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: var(--ion-color-light);
-  margin-bottom: 6px;
-}
-
-.home-welcome p {
-  font-size: 1.05rem;
-  color: var(--ion-text-color);
-}
-
 .home-free-section {
   display: flex;
   flex-direction: column;
@@ -203,49 +196,6 @@ const generateRecipeOnDemand = async () => {
   border-radius: 18px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
-
-.home-recipe h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--ion-color-light);
-  margin-bottom: 12px;
-}
-
-.home-recipe-card h3 {
-  font-size: 1.35rem;
-  font-weight: 600;
-  color: var(--ion-color-light);
-  margin: 0;
-}
-
-.home-recipe-card p {
-  color: var(--ion-text-color);
-  font-size: 1.1rem;
-  margin: 0;
-}
-
-.home-recipe-card ion-button {
-  --background: var(--ion-color-primary);
-  --border-radius: 12px;
-  width: fit-content;   /* bouton non full width */
-  padding: 0 20px;
-  align-self: flex-start;
-}
-
-
-.home-tips h2 {
-  font-size: 1.45rem;
-  font-weight: 600;
-  color: var(--ion-color-light);
-  margin-bottom: 12px;
-}
-
-.home-tips p {
-  font-size: 1.05rem;
-  line-height: 1.45;
-  color: var(--ion-text-color);
-}
-
 
 .home-section {
   padding: 10px 10px;
