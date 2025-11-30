@@ -13,6 +13,7 @@ export interface Step {
 }
 
 export interface Recipe {
+    id : number;
     name: string;
     durationMinutes: number;
     isFavorite?: boolean;

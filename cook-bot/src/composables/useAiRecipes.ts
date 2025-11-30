@@ -98,6 +98,13 @@ export function useAiRecipes() {
         );
     }
 
+    function setRecipeFromFavorite(recipe: Recipe) {
+        aiError.value = '';
+        aiRecipeTitles.value = null;
+        aiRecipe.value = recipe;
+    }
+
+
     return {
         loadingAi,
         aiError,
@@ -107,5 +114,6 @@ export function useAiRecipes() {
         getRecipeFromIngredients,
         getTitlesFromImage,
         getRecipeFromImage,
+        setRecipeFromFavorite,
     };
 }

@@ -83,6 +83,7 @@
           :ai-error="aiError"
           :ai-recipe="aiRecipe"
           :ai-recipe-titles="aiRecipeTitles"
+          :show-save-button="true"
       />
 
     </ion-content>

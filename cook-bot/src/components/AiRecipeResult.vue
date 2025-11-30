@@ -1,14 +1,51 @@
 <script setup lang="ts">
 import {
   IonText,
+  IonButton,
 } from '@ionic/vue';
+import {ref, withDefaults } from 'vue';
 import type { Recipe, RecipeTitle } from '@/services/aiAPI';
-
-defineProps<{
+import { createRecipe } from '@/services/recipeAPI'
+const props = withDefaults(defineProps<{
   aiError: string;
   aiRecipe: Recipe | null;
   aiRecipeTitles: RecipeTitle[] | null;
-}>();
+  showSaveButton?: boolean; // 👉 nouveau
+}>(), {
+  showSaveButton: false,
+});
+
+const saving = ref(false);
+const saveSuccess = ref(false);
+const saveError = ref('');
+
+async function onSaveRecipe() {
+  if (!props.aiRecipe) return;
+
+  saving.value = true;
+  saveError.value = '';
+  saveSuccess.value = false;
+
+  try {
+    await createRecipe({
+      name: props.aiRecipe.name,
+      durationMinutes: props.aiRecipe.durationMinutes,
+      isFavorite: true,
+      ingredients: props.aiRecipe.ingredients,
+      steps: props.aiRecipe.steps,
+    });
+
+    saveSuccess.value = true;
+  } catch (err) {
+    console.error(err);
+    saveError.value =
+        err instanceof Error
+            ? err.message
+            : 'Erreur lors de la sauvegarde de la recette';
+  } finally {
+    saving.value = false;
+  }
+}
 </script>
 
 <template>
@@ -53,6 +90,25 @@ defineProps<{
       <div class="home-card">
         <h2 class="home-card-title">{{ aiRecipe.name }}</h2>
         <p class="home-card-text">{{ aiRecipe.durationMinutes }} min</p>
+
+        <!-- bouton sauvegarde -->
+        <div v-if="showSaveButton" class="home-save-wrapper">
+          <ion-button
+              size="small"
+              expand="block"
+              :disabled="saving || saveSuccess"
+              @click="onSaveRecipe"
+          >
+            <span v-if="!saving && !saveSuccess">Sauvegarder la recette</span>
+            <span v-else-if="saving">Sauvegarde...</span>
+            <span v-else>Recette sauvegardée ✔️</span>
+          </ion-button>
+
+          <p v-if="saveError" class="home-card-text" style="color: var(--ion-color-danger)">
+            {{ saveError }}
+          </p>
+        </div>
+
 
         <div class="home-card-content fade-in">
           <!-- Ingrédients -->
