@@ -3,14 +3,15 @@ import {
   IonText,
   IonButton,
 } from '@ionic/vue';
-import {ref, withDefaults } from 'vue';
+import {ref, withDefaults, watch } from 'vue';
 import type { Recipe, RecipeTitle } from '@/services/aiAPI';
 import { createRecipe } from '@/services/recipeAPI'
+
 const props = withDefaults(defineProps<{
   aiError: string;
   aiRecipe: Recipe | null;
   aiRecipeTitles: RecipeTitle[] | null;
-  showSaveButton?: boolean; // 👉 nouveau
+  showSaveButton?: boolean;
 }>(), {
   showSaveButton: false,
 });
@@ -18,6 +19,15 @@ const props = withDefaults(defineProps<{
 const saving = ref(false);
 const saveSuccess = ref(false);
 const saveError = ref('');
+
+watch(
+    () => props.aiRecipe,
+    () => {
+      saving.value = false;
+      saveSuccess.value = false;
+      saveError.value = '';
+    }
+);
 
 async function onSaveRecipe() {
   if (!props.aiRecipe) return;

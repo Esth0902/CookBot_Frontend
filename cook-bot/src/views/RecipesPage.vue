@@ -74,6 +74,94 @@
         </ion-button>
       </ion-card-content>
     </ion-card>
+      <ion-card class="ion-margin">
+        <ion-card-header>
+          <ion-card-title>À partir d’un plat</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-input
+                label="Nom du plat"
+                label-placement="stacked"
+                v-model="dishValue"
+                placeholder="Omelette au fromage, pasta carbonara…"
+            />
+          </ion-item>
+
+          <ion-button
+              expand="block"
+              class="ion-margin-top"
+              :disabled="loadingAi || dishValueCleaned.length === 0"
+              @click="handleGenerateRecipeFromDish"
+          >
+            <span v-if="!loadingAi">Générer une recette depuis ce plat</span>
+            <span v-else>Génération en cours...</span>
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="ion-margin">
+        <ion-card-header>
+          <ion-card-title>Mes recettes sauvegardées</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div v-if="recipeError" class="ion-padding-top">
+            <ion-text color="danger">
+              <p>{{ recipeError }}</p>
+            </ion-text>
+          </div>
+
+          <ion-list v-if="recipes.length">
+            <div
+                v-for="rec in recipes"
+                :key="rec.id"
+            >
+              <ion-item>
+                <ion-label @click="toggleExpanded(rec)" class="recipe-title-label">
+                  <h3 class="recipe-title-clickable">{{ rec.name }}</h3>
+                </ion-label>
+
+                <ion-button
+                    slot="end"
+                    size="small"
+                    fill="clear"
+                    :color="rec.isFavorite ? 'danger' : 'medium'"
+                    :disabled="togglingFavoriteID === rec.id"
+                    @click.stop="toggleFavorite(rec)"
+                >
+                  <ion-icon :icon="rec.isFavorite ? heart : heartOutline" />
+                </ion-button>
+
+                <ion-button
+                    slot="end"
+                    size="small"
+                    fill="clear"
+                    color="danger"
+                    :disabled="deletingRecipeID === rec.id"
+                    @click.stop="removeRecipe(rec)"
+                >
+                  <ion-icon :icon="closeOutline" />
+                </ion-button>
+              </ion-item>
+
+              <div
+                  v-if="expandedRecipeId === rec.id"
+                  class="ion-padding-start ion-padding-end ion-padding-bottom"
+              >
+                <AiRecipeResult
+                    :ai-error="''"
+                    :ai-recipe="rec"
+                    :ai-recipe-titles="null"
+                />
+              </div>
+            </div>
+          </ion-list>
+
+          <p v-else-if="!loadingRecipes" class="ion-padding-top">
+            Aucune recette pour l’instant.
+          </p>
+        </ion-card-content>
+      </ion-card>
 
 
 
@@ -94,15 +182,16 @@
 import {
   IonButton, IonCard,
   IonCardContent,
-  IonCardHeader, IonCardTitle, IonContent, IonHeader, IonInput, IonItem,
-  IonPage, IonTitle, IonToolbar,
+  IonCardHeader, IonCardTitle, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList,
+  IonPage, IonText, IonTitle, IonToolbar, onIonViewWillEnter,
 } from '@ionic/vue';
 import { computed, ref } from 'vue';
-import LogoutButton from '@/components/LogoutButton.vue';
-import type { IngredientInput } from '@/services/aiAPI';
+import type {IngredientInput, Recipe} from '@/services/aiAPI';
 import { useAiRecipes } from '@/composables/useAiRecipes';
 import AiRecipeResult from "@/components/AiRecipeResult.vue";
 import Header from "@/components/Header.vue";
+import { useFavoriteRecipes } from '@/composables/useFavoriteRecipes';
+import { heart, heartOutline, closeOutline } from 'ionicons/icons';
 
 const {
   loadingAi,
@@ -111,12 +200,45 @@ const {
   aiRecipeTitles,
   getTitlesFromIngredients,
   getRecipeFromIngredients,
+  getRecipeFromDish,
 } = useAiRecipes();
+
+const {
+  loadingRecipes,
+  recipeError,
+  recipes,
+  fetchRecipes,
+  removeRecipe,
+  deletingRecipeID,
+  togglingFavoriteID,
+  toggleFavorite,
+} = useFavoriteRecipes();
+
+const expandedRecipeId = ref<number | null>(null);
+
+onIonViewWillEnter(() => {
+  fetchRecipes();
+});
+
+function toggleExpanded(rec: Recipe) {
+  if (expandedRecipeId.value === rec.id) {
+    expandedRecipeId.value = null;
+  } else {
+    expandedRecipeId.value = rec.id;
+  }
+}
+
+function onToggleRecipeFavorite(rec: Recipe) {
+  toggleFavorite(rec);
+}
 
 
 const manualIngredients = ref<IngredientInput[]>([
   { name: '', quantity: 0, unit: '' },
 ]);
+
+const dishValue = ref('');
+const dishValueCleaned = computed(() => dishValue.value.trim());
 
 const manualIngredientsCleaned = computed(() =>
     manualIngredients.value.filter(
@@ -144,6 +266,10 @@ const handleGenerateRecipeTitleFromManual = () =>
 
 const handleGenerateRecipeFromManual = () =>
     getRecipeFromIngredients(manualIngredientsCleaned.value);
+
+const handleGenerateRecipeFromDish = () =>
+    getRecipeFromDish(dishValueCleaned.value);
+
 
 </script>
 

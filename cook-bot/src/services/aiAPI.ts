@@ -162,5 +162,29 @@ export async function generateRecipeFromIngredients(
     return json.data;
 }
 
+export async function generateRecipeFromDish(
+    dishName: string,
+): Promise<Recipe> {
+    const response = await authFetch('/api/v1/ai/dish', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ dishName }),
+    });
+
+    const json = await handleJsonResponse<{
+        success: boolean;
+        responseCode: number;
+        responseMessage: string;
+        data: Recipe;
+    }>(
+        response,
+        'Erreur lors de la génération de la recette',
+    );
+
+    return json.data;
+}
+
 
 

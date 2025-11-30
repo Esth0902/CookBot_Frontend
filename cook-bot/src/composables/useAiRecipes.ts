@@ -5,6 +5,7 @@ import {
     generateRecipeTitleFromImage,
     generateRecipeFromIngredients,
     generateRecipeTitleFromIngredients,
+    generateRecipeFromDish,
 } from '@/services/aiAPI';
 
 export function useAiRecipes() {
@@ -104,6 +105,20 @@ export function useAiRecipes() {
         aiRecipe.value = recipe;
     }
 
+    async function getRecipeFromDish(dish: string) {
+        if (!dish || !dish.trim()) {
+            aiError.value = 'Entre un nom de plat';
+            return;
+        }
+
+        await withAiState(
+            () => generateRecipeFromDish(dish),
+            (recipe) => {
+                aiRecipe.value = recipe;
+            },
+            'Erreur lors de la génération de la recette depuis le plat',
+        );
+    }
 
     return {
         loadingAi,
@@ -115,5 +130,6 @@ export function useAiRecipes() {
         getTitlesFromImage,
         getRecipeFromImage,
         setRecipeFromFavorite,
+        getRecipeFromDish,
     };
 }

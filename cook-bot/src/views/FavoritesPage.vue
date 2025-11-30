@@ -9,20 +9,10 @@
         </ion-card-header>
 
         <ion-card-content>
-          <ion-button
-              expand="block"
-              fill="outline"
-              size="small"
-              :disabled="loadingFavorites"
-              @click="fetchFavoriteRecipes"
-          >
-            <span v-if="!loadingFavorites">Recharger les favoris</span>
-            <span v-else>Chargement...</span>
-          </ion-button>
 
-          <div v-if="favoritesError" class="ion-padding-top">
+          <div v-if="recipeError" class="ion-padding-top">
             <ion-text color="danger">
-              <p>{{ favoritesError }}</p>
+              <p>{{ recipeError }}</p>
             </ion-text>
           </div>
 
@@ -60,7 +50,7 @@
             </div>
           </ion-list>
 
-          <p v-else-if="!loadingFavorites" class="ion-padding-top">
+          <p v-else-if="!loadingRecipes" class="ion-padding-top">
             Aucune recette favorite pour l’instant.
           </p>
         </ion-card-content>
@@ -85,7 +75,7 @@ import {
   IonContent,
   onIonViewWillEnter,
 } from '@ionic/vue';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { heart } from 'ionicons/icons';
 
 import type { Recipe } from '@/services/aiAPI';
@@ -95,18 +85,18 @@ import Header from '@/components/Header.vue';
 import AiRecipeResult from '@/components/AiRecipeResult.vue';
 
 const {
-  loadingFavorites,
-  favoritesError,
+  loadingRecipes,
+  recipeError,
   favoriteRecipes,
   togglingFavoriteID,
-  fetchFavoriteRecipes,
+  fetchRecipes,
   toggleFavorite,
 } = useFavoriteRecipes();
 
 const expandedRecipeId = ref<number | null>(null);
 
 onIonViewWillEnter(() => {
-  fetchFavoriteRecipes();
+  fetchRecipes();
 });
 
 function toggleExpanded(rec: Recipe) {
