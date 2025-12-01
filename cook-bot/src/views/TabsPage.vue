@@ -10,7 +10,7 @@
           <ion-label>Accueil</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="myfridge" href="/tabs/myfridge">
+        <ion-tab-button v-if="userRole === 'PREMIUM'" tab="myfridge" href="/tabs/myfridge">
           <ion-icon :icon="cameraOutline" />
           <ion-label>Mon Frigo</ion-label>
         </ion-tab-button>
@@ -53,4 +53,20 @@ import {
   sparklesOutline,
   heartOutline,
 } from 'ionicons/icons';
+
+import { ref } from "vue";
+import {onIonViewWillEnter} from "@ionic/vue";
+import { getUserPlan } from "@/services/authApi";
+
+const userRole = ref("FREE")
+
+const loadUserRole = () => {
+  const plan = getUserPlan();
+  userRole.value = plan ?? "FREE";
+};
+
+onIonViewWillEnter(() => {
+  loadUserRole();
+});
+
 </script>
