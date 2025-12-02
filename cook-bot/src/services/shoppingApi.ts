@@ -1,4 +1,5 @@
-import { getToken } from './authApi';
+import { getToken, authFetch } from './authApi';
+
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -18,7 +19,7 @@ export interface ShoppingList {
 
 export async function getAllShoppingLists(): Promise<ShoppingList[]> {
     const token = getToken();
-    const response = await fetch('/api/v1/shopping/', {
+    const response = await authFetch('/api/v1/shopping/', {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
