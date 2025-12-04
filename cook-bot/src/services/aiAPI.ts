@@ -21,6 +21,17 @@ export interface Recipe {
     steps: Step[];
 }
 
+export interface Metric {
+    id: number;
+    executionTime: number;
+    inputToken:number;
+    outputToken:number;
+    totalToken:number;
+    creationDate:Date;
+    username:string;
+    userId:number;
+}
+
 export interface RecipeTitle {
     title: string;
     durationMinutes: number;

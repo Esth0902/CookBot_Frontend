@@ -29,6 +29,11 @@ const routes: Array<RouteRecordRaw> = [
         meta: {guestOnly: true}
     },
     {
+        path:'/dashboard',
+        component: () => import ('@/views/DashboardPage.vue'),
+        meta: {requiresAuth: true}
+    },
+    {
         path: '/tabs/',
         component: TabsPage,
         meta: {requiresAuth: true},
