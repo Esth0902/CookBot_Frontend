@@ -5,15 +5,14 @@
 <ion-content class="shopping-content">
 
   <h1 class="shopping-title">Mes listes de courses</h1>
+  <IonButton class="add-list-btn" @click="handleAddList">
+    + Ajouter une liste
+  </IonButton>
 
   <div v-if="!shoppingLists.length" class="shopping-empty">
     <p>Aucune liste de courses pour le moment</p>
-    <IonButton class="add-list-btn" @click="handleAddList">
-    + Ajouter une liste
-  </IonButton>
+
   </div>
-
-
 
   <div v-else>
 
