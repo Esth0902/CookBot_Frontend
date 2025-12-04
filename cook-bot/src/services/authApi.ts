@@ -135,3 +135,30 @@ export async function authFetch(path: string, options: RequestInit = {}): Promis
         headers,
     });
 }
+
+export async function startTrial(): Promise<string> {
+    const response = await authFetch('/api/v1/user/trial', {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Erreur lors de l'activation de la période d'essai");
+    }
+
+    const body: ApiResponse<string> = await response.json();
+
+    if (!body.success) {
+        throw new Error(body.responseMessage || "Erreur lors de l'activation de l'essai");
+    }
+
+    const token = body.data;
+
+    if (!token) {
+        throw new Error('Token manquant dans la réponse serveur');
+    }
+
+    saveToken(token);
+
+    return body.data;
+}

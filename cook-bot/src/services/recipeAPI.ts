@@ -1,5 +1,5 @@
 import { authFetch } from '@/services/authApi';
-import type {Ingredient, Recipe, Step} from '@/services/aiAPI';
+import type {Recipe} from '@/services/aiAPI';
 
 type NewRecipePayload = {
     name: string;
@@ -40,26 +40,25 @@ export async function deleteRecipe(recipeId: number) : Promise<void> {
     }
 }
 
-
-export async function getFavoriteRecipes(): Promise<Recipe[]> {
-    const response = await authFetch('/api/v1/recipe/favorites', {
-        method: 'GET',
-    });
-
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || 'Erreur lors de la récupération des recettes favorites');
-    }
-
-    const json = await response.json() as {
-        success: boolean;
-        responseCode: number;
-        responseMessage: string;
-        data: Recipe[];
-    };
-
-    return json.data;
-}
+// export async function getFavoriteRecipes(): Promise<Recipe[]> {
+//     const response = await authFetch('/api/v1/recipe/favorites', {
+//         method: 'GET',
+//     });
+//
+//     if (!response.ok) {
+//         const text = await response.text();
+//         throw new Error(text || 'Erreur lors de la récupération des recettes favorites');
+//     }
+//
+//     const json = await response.json() as {
+//         success: boolean;
+//         responseCode: number;
+//         responseMessage: string;
+//         data: Recipe[];
+//     };
+//
+//     return json.data;
+// }
 
 export async function toggleFavoriteRecipe(recipeId: number): Promise<void> {
     const response = await authFetch(`/api/v1/recipe/${recipeId}`, {

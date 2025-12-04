@@ -26,7 +26,7 @@ const handleSubmit = async () => {
 
   try {
     await register(username.value, password.value);
-    success.value = 'Compte créé, tu peux te connecter 👌';
+    //success.value = 'Compte créé, tu peux te connecter 👌';
 
     await login(username.value, password.value);
       router.push('/tabs/home');

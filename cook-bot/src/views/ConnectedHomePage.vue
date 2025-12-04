@@ -3,6 +3,8 @@ import {
   IonPage,
   IonContent,
   IonSpinner,
+  IonButton,
+
   onIonViewWillEnter,
 } from '@ionic/vue';
 
@@ -61,6 +63,10 @@ const generateRecipeOnDemand = async () => {
   generatingRecipe.value = false;
 };
 
+const onTrialActivated = () => {
+  loadUserData();
+};
+
 </script>
 
 <template>
@@ -88,7 +94,7 @@ const generateRecipeOnDemand = async () => {
           <img src="/banner.png" alt="Publicité CookBot" class="banner" />
 
           <div class="home-offer-card">
-            <Pricing />
+            <Pricing @trialActivated="onTrialActivated" />
           </div>
 
           <div class="home-separator">

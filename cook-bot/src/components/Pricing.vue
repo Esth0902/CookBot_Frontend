@@ -2,6 +2,9 @@
   <section class="pricing-section">
     <h1 class="pricing-title">Avec Premium, c’est moins de prise de tête et beaucoup plus de goût.</h1>
 
+    <p v-if="error" class="pricing-error"> {{ error }}</p>
+    <p v-if="success" class="pricing-success"> {{ success }}</p>
+
     <div class="pricing-grid">
 
       <!-- FREE PLAN -->
@@ -32,8 +35,11 @@
           <li>Accès à la liste de courses</li>
         </ul>
 
-        <button class="plan-button premium-btn">
-          Essayer gratuitement durant 5 jours
+        <button class="plan-button premium-btn"
+        @click="onStartTrial"
+        :disabled="loading">
+          <span v-if="!loading">Essayer gratuitement durant 5 jours</span>
+          <span v-else>Activation de l'essai</span>
         </button>
       </div>
 
@@ -42,7 +48,42 @@
 </template>
 
 
-<script setup>
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { isAuthenticated, startTrial } from '@/services/authApi';
+
+const router = useRouter();
+
+const emit = defineEmits(['trialActivated']);
+
+const loading = ref(false);
+const error = ref('');
+const success = ref('');
+
+const onStartTrial = async () => {
+  error.value = '';
+  success.value = '';
+
+
+  if (!isAuthenticated()) {
+    router.push('/register');
+    return;
+  }
+
+  loading.value = true;
+  try {
+    const msg = await startTrial();
+    success.value = msg || 'Essai Premium activé 🎉';
+
+    emit('trialActivated');
+  } catch (e: any) {
+    console.error(e);
+    error.value = e.message || 'Erreur lors de l’activation de l’essai';
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <style scoped>
@@ -130,4 +171,18 @@
 .premium {
   border: 1px solid var(--ion-color-secondary);
 }
+
+.pricing-error {
+  color: var(--ion-color-secondary);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.pricing-success {
+  color: var(--ion-color-primary);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+
 </style>
