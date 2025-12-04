@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { register } from '@/services/authApi';
+import { register, login } from '@/services/authApi';
 import {
   IonPage,
   IonContent,
@@ -28,10 +28,8 @@ const handleSubmit = async () => {
     await register(username.value, password.value);
     success.value = 'Compte créé, tu peux te connecter 👌';
 
-    // Option : redirection directe vers login
-    setTimeout(() => {
-      router.push('/login');
-    }, 800);
+    await login(username.value, password.value);
+      router.push('/tabs/home');
   } catch (err: any) {
     console.error(err);
     error.value = err.message || 'Erreur lors de l’inscription';
