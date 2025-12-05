@@ -74,7 +74,6 @@ const fetchMetrics = async () => {
   try {
     dashboard.value = await getMetricByRangeDate(new Date(startDate.value), new Date(endDate.value));
     
-    // Process data for both chart and table
     const {labels, data} = processDataForChart(dashboard.value);
     createOrUpdateChart(labels, data);
     
@@ -116,6 +115,13 @@ const processDataForChart = (metrics: Metric[]): { labels: string[], data: numbe
   return {labels: monthLabels, data: monthlyData};
 };
 
+const hexToRgba = (hex: string, alpha: number): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 const createOrUpdateChart = (labels: string[], data: number[]) => {
   if (!chartCanvas.value) {
     return;
@@ -124,6 +130,15 @@ const createOrUpdateChart = (labels: string[], data: number[]) => {
   if (!ctx) {
     return;
   }
+
+  const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--ion-color-primary').trim();
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--ion-text-color').trim();
+
+  const chartColors = {
+    backgroundColor: hexToRgba(primaryColor, 0.4),
+    borderColor: primaryColor,
+    textColor: textColor
+  };
 
   if (chartInstance) {
     chartInstance.data.labels = labels;
@@ -137,8 +152,8 @@ const createOrUpdateChart = (labels: string[], data: number[]) => {
         datasets: [{
           label: 'Total Tokens Used',
           data: data,
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: chartColors.backgroundColor,
+          borderColor: chartColors.borderColor,
           borderWidth: 1
         }]
       },
@@ -146,7 +161,28 @@ const createOrUpdateChart = (labels: string[], data: number[]) => {
         responsive: true,
         scales: {
           y: {
-            beginAtZero: true
+            beginAtZero: true,
+            ticks: {
+              color: chartColors.textColor
+            },
+            grid: {
+              color: hexToRgba(chartColors.textColor, 0.1)
+            }
+          },
+          x: {
+            ticks: {
+              color: chartColors.textColor
+            },
+            grid: {
+              color: hexToRgba(chartColors.textColor, 0.1)
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: chartColors.textColor
+            }
           }
         }
       }
@@ -172,19 +208,27 @@ ion-button {
   height: 40vh;
   width: 80vw;
   margin: auto;
+  margin-top: 2rem;
 }
 
+/* Ensure date picker items have a transparent background to blend with the theme */
+ion-item {
+  --background: transparent;
+}
+
+/* Style the date picker button text */
 ion-datetime-button::part(native) {
-  color: black;
+  color: var(--ion-text-color);
 }
 
-
+/* Style the calendar that pops up in the modal */
 ion-modal ion-datetime {
-  --background: #100f0f;
-  --ion-background-color: #e61212;
-  --color: #000;
-  --day-text-color: #000;
-  --month-year-text-color: #000;
-  --weekday-text-color: #000;
+  --background: var(--ion-background-color);
+  --ion-text-color: var(--ion-text-color);
+  --color: var(--ion-text-color);
+  --day-text-color: var(--ion-text-color);
+  --month-year-text-color: var(--ion-text-color);
+  --weekday-text-color: var(--ion-text-color);
+  --title-color: var(--ion-text-color);
 }
 </style>

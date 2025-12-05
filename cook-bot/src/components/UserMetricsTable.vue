@@ -81,15 +81,16 @@ table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  color: var(--ion-text-color);
 }
 
 th, td {
   padding: 12px 15px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 thead tr {
-  background-color: #42b983;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .sortable-header {
@@ -98,19 +99,20 @@ thead tr {
 }
 
 .sortable-header:hover {
-  background-color: #252323;
+  background-color: var(--ion-color-secondary);
+  color: #000;
 }
 
 .bar-container {
   width: 100%;
-  background-color: #e0e0e0;
+  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   height: 20px;
 }
 
 .bar {
   height: 100%;
-  background-color: #42b983;
+  background-color: var(--ion-color-primary);
   border-radius: 4px;
   transition: width 0.5s ease-in-out;
 }
