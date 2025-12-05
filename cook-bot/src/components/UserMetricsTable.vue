@@ -4,12 +4,16 @@
       <thead>
         <tr>
           <th>User ID</th>
-          <th>Total Tokens</th>
+          <th @click="toggleSort" class="sortable-header">
+            Total Tokens
+            <span v-if="sortOrder === 'asc'">▲</span>
+            <span v-if="sortOrder === 'desc'">▼</span>
+          </th>
           <th>Usage</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in userData" :key="user.userId">
+        <tr v-for="user in sortedUserData" :key="user.userId">
           <td>{{ user.userId }}</td>
           <td>{{ user.totalTokens }}</td>
           <td>
@@ -24,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed } from 'vue';
+import { defineProps, computed, ref } from 'vue';
 
 interface UserMetric {
   userId: string;
@@ -35,12 +39,35 @@ const props = defineProps<{
   userData: UserMetric[]
 }>();
 
+const sortOrder = ref<'asc' | 'desc' | 'none'>('none');
+
+const sortedUserData = computed(() => {
+  const data = [...props.userData];
+  if (sortOrder.value === 'asc') {
+    return data.sort((a, b) => a.totalTokens - b.totalTokens);
+  }
+  if (sortOrder.value === 'desc') {
+    return data.sort((a, b) => b.totalTokens - a.totalTokens);
+  }
+  return data;
+});
+
 const maxTokens = computed(() => {
   if (!props.userData || props.userData.length === 0) {
     return 1; // Avoid division by zero
   }
   return Math.max(...props.userData.map(user => user.totalTokens));
 });
+
+const toggleSort = () => {
+  if (sortOrder.value === 'none') {
+    sortOrder.value = 'asc';
+  } else if (sortOrder.value === 'asc') {
+    sortOrder.value = 'desc';
+  } else {
+    sortOrder.value = 'none';
+  }
+};
 </script>
 
 <style scoped>
@@ -65,9 +92,18 @@ thead tr {
   background-color: #42b983;
 }
 
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable-header:hover {
+  background-color: #252323;
+}
+
 .bar-container {
   width: 100%;
-  background-color: #302323;
+  background-color: #e0e0e0;
   border-radius: 4px;
   height: 20px;
 }
