@@ -144,4 +144,18 @@ ion-button {
   width: 80vw;
   margin: auto;
 }
+
+ion-datetime-button::part(native) {
+  color: black;
+}
+
+
+ion-modal ion-datetime {
+  --background: #100f0f;
+  --ion-background-color: #e61212;
+  --color: #000;
+  --day-text-color: #000;
+  --month-year-text-color: #000;
+  --weekday-text-color: #000;
+}
 </style>
