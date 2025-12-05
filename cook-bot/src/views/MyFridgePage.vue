@@ -94,6 +94,7 @@
               :ai-recipe="aiRecipe"
               :ai-recipe-titles="aiRecipeTitles"
               :show-save-button="true"
+              @select-title="handleGenerateRecipeFromTitle"
           />
         </section>
 
@@ -125,6 +126,7 @@
     aiRecipeTitles,
     getTitlesFromImage,
     getRecipeFromImage,
+    getRecipeFromDish,
   } = useAiRecipes();
 
   const handleGenerateRecipeTitleFromImage = async () => {
@@ -136,6 +138,11 @@
     const photo = photos.value[0];
     await getRecipeFromImage(photo);
   };
+
+  const handleGenerateRecipeFromTitle = async (title : string) => {
+    await getRecipeFromDish(title);
+  };
+
   </script>
 
   <style scoped>

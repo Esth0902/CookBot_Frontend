@@ -16,6 +16,10 @@ const props = withDefaults(defineProps<{
   showSaveButton: false,
 });
 
+const emit = defineEmits<{
+  (e: 'select-title', title: string): void;
+}>();
+
 const saving = ref(false);
 const saveSuccess = ref(false);
 const saveError = ref('');
@@ -83,6 +87,7 @@ async function onSaveRecipe() {
               v-for="(rec, idx) in aiRecipeTitles"
               :key="idx"
               class="recipe-idea-item"
+              @click="emit('select-title', rec.title)"
           >
             <h3 class="recipe-idea-title">{{ rec.title }}</h3>
             <p class="recipe-idea-duration">{{ rec.durationMinutes }} min</p>
@@ -208,6 +213,7 @@ async function onSaveRecipe() {
   border: 1px solid rgba(44, 206, 210, 0.3);
   text-align: left;
   transition: 0.3s;
+  cursor: pointer;
 }
 
 .recipe-idea-item:hover {
