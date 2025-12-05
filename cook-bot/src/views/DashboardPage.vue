@@ -24,7 +24,9 @@
       <div class="chart-container">
         <canvas ref="chartCanvas"></canvas>
       </div>
-      <user-metrics-table :user-data="userMetrics"></user-metrics-table>
+      <div class="metrics-wrapper">
+        <user-metrics-table :user-data="userMetrics"></user-metrics-table>
+      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -220,6 +222,11 @@ ion-item {
 ion-datetime-button::part(native) {
   color: black;
 }
+
+.metrics-wrapper {
+  margin-top: 2rem;
+}
+
 
 /* Style the calendar that pops up in the modal */
 ion-modal ion-datetime {
