@@ -1,29 +1,36 @@
 <template>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th @click="toggleSort" class="sortable-header">
-            Total Tokens
-            <span v-if="sortOrder === 'asc'">▲</span>
-            <span v-if="sortOrder === 'desc'">▼</span>
-          </th>
-          <th>Usage</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in sortedUserData" :key="user.username">
-          <td>{{ user.username }}</td>
-          <td>{{ user.totalTokens }}</td>
-          <td>
-            <div class="bar-container">
-              <div class="bar" :style="{ width: (user.totalTokens / maxTokens) * 100 + '%' }"></div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div>
+    <div class="filter-controls">
+      <input type="number" v-model.number="minTokensFilter" placeholder="Minimum tokens" class="filter-input" />
+      <button @click="applyFilter" class="filter-button">Filter</button>
+      <button @click="clearFilter" class="filter-button clear">Clear</button>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th @click="toggleSort" class="sortable-header">
+              Total Tokens
+              <span v-if="sortOrder === 'asc'">▲</span>
+              <span v-if="sortOrder === 'desc'">▼</span>
+            </th>
+            <th>Usage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in sortedAndFilteredUserData" :key="user.username">
+            <td>{{ user.username }}</td>
+            <td>{{ user.totalTokens }}</td>
+            <td>
+              <div class="bar-container">
+                <div class="bar" :style="{ width: (user.totalTokens / maxTokens) * 100 + '%' }"></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -40,15 +47,25 @@ const props = defineProps<{
 }>();
 
 const sortOrder = ref<'asc' | 'desc' | 'none'>('none');
+const minTokensFilter = ref<number | null>(null);
+const appliedMinTokens = ref<number | null>(null);
 
-const sortedUserData = computed(() => {
-  const data = [...props.userData];
+const sortedAndFilteredUserData = computed(() => {
+  let data = [...props.userData];
+
+  // Apply filter
+  if (appliedMinTokens.value !== null && appliedMinTokens.value >= 0) {
+    data = data.filter(user => user.totalTokens >= appliedMinTokens.value!);
+  }
+
+  // Apply sort
   if (sortOrder.value === 'asc') {
     return data.sort((a, b) => a.totalTokens - b.totalTokens);
   }
   if (sortOrder.value === 'desc') {
     return data.sort((a, b) => b.totalTokens - a.totalTokens);
   }
+  
   return data;
 });
 
@@ -68,13 +85,49 @@ const toggleSort = () => {
     sortOrder.value = 'none';
   }
 };
+
+const applyFilter = () => {
+  appliedMinTokens.value = minTokensFilter.value;
+};
+
+const clearFilter = () => {
+  minTokensFilter.value = null;
+  appliedMinTokens.value = null;
+};
 </script>
 
 <style scoped>
+.filter-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.filter-input {
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);
+  color: var(--ion-text-color);
+  border-radius: 4px;
+}
+
+.filter-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--ion-color-primary);
+  color: #000;
+  cursor: pointer;
+}
+
+.filter-button.clear {
+  background-color: var(--ion-color-secondary);
+}
+
 .table-container {
   width: 100%;
   overflow-x: auto;
-  margin-bottom: 2rem;
 }
 
 table {
