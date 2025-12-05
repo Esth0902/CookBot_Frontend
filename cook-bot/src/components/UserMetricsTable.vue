@@ -1,9 +1,10 @@
 <template>
   <div>
     <div class="filter-controls">
+      <input type="text" v-model="usernameFilter" placeholder="Filter by username..." class="filter-input" />
       <input type="number" v-model.number="minTokensFilter" placeholder="Minimum tokens" class="filter-input" />
-      <button @click="applyFilter" class="filter-button">Filter</button>
-      <button @click="clearFilter" class="filter-button clear">Clear</button>
+      <button @click="applyTokenFilter" class="filter-button">Filter</button>
+      <button @click="clearFilters" class="filter-button clear">Clear</button>
     </div>
     <div class="table-container">
       <table>
@@ -19,7 +20,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in sortedAndFilteredUserData" :key="user.username">
+          <tr v-for="user in displayedData" :key="user.username">
             <td>{{ user.username }}</td>
             <td>{{ user.totalTokens }}</td>
             <td>
@@ -35,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed, ref } from 'vue';
+import { defineProps, ref, watch } from 'vue';
 
 interface UserMetric {
   username: string;
@@ -46,36 +47,52 @@ const props = defineProps<{
   userData: UserMetric[]
 }>();
 
+// --- STATE ---
 const sortOrder = ref<'asc' | 'desc' | 'none'>('none');
+const usernameFilter = ref('');
 const minTokensFilter = ref<number | null>(null);
 const appliedMinTokens = ref<number | null>(null);
 
-const sortedAndFilteredUserData = computed(() => {
-  let data = [...props.userData];
+// --- FINAL DISPLAY DATA ---
+const displayedData = ref<UserMetric[]>([]);
+const maxTokens = ref(1);
 
-  // Apply filter
-  if (appliedMinTokens.value !== null && appliedMinTokens.value >= 0) {
-    data = data.filter(user => user.totalTokens >= appliedMinTokens.value!);
-  }
+// --- WATCH EFFECT to manually trigger reactivity ---
+watch(
+  () => [props.userData, usernameFilter.value, appliedMinTokens.value, sortOrder.value],
+  () => {
+    let data = [...props.userData];
 
-  // Apply sort
-  if (sortOrder.value === 'asc') {
-    return data.sort((a, b) => a.totalTokens - b.totalTokens);
-  }
-  if (sortOrder.value === 'desc') {
-    return data.sort((a, b) => b.totalTokens - a.totalTokens);
-  }
-  
-  return data;
-});
+    // Apply username filter
+    if (usernameFilter.value) {
+      data = data.filter(user =>
+        user.username.toLowerCase().startsWith(usernameFilter.value.toLowerCase())
+      );
+    }
 
-const maxTokens = computed(() => {
-  if (!props.userData || props.userData.length === 0) {
-    return 1; // Avoid division by zero
-  }
-  return Math.max(...props.userData.map(user => user.totalTokens));
-});
+    // Apply token filter
+    if (appliedMinTokens.value !== null && appliedMinTokens.value >= 0) {
+      data = data.filter(user => user.totalTokens >= appliedMinTokens.value!);
+    }
+    
+    // Update max tokens for the bar scaling based on the filtered data
+    const currentMax = Math.max(...data.map(user => user.totalTokens));
+    maxTokens.value = currentMax > 0 ? currentMax : 1;
 
+    // Apply sort
+    if (sortOrder.value === 'asc') {
+      data.sort((a, b) => a.totalTokens - b.totalTokens);
+    } else if (sortOrder.value === 'desc') {
+      data.sort((a, b) => b.totalTokens - a.totalTokens);
+    }
+
+    displayedData.value = data;
+  },
+  { immediate: true, deep: true } // immediate to run on load, deep for userData changes
+);
+
+
+// --- METHODS ---
 const toggleSort = () => {
   if (sortOrder.value === 'none') {
     sortOrder.value = 'asc';
@@ -86,11 +103,12 @@ const toggleSort = () => {
   }
 };
 
-const applyFilter = () => {
+const applyTokenFilter = () => {
   appliedMinTokens.value = minTokensFilter.value;
 };
 
-const clearFilter = () => {
+const clearFilters = () => {
+  usernameFilter.value = '';
   minTokensFilter.value = null;
   appliedMinTokens.value = null;
 };
@@ -99,6 +117,7 @@ const clearFilter = () => {
 <style scoped>
 .filter-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 1rem;
   align-items: center;
