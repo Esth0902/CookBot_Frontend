@@ -24,12 +24,14 @@
       <div class="chart-container">
         <canvas ref="chartCanvas"></canvas>
       </div>
+      <user-metrics-table :user-data="userMetrics"></user-metrics-table>
     </ion-content>
   </ion-page>
 </template>
 
 
 <script setup lang="ts">
+import UserMetricsTable from '@/components/UserMetricsTable.vue';
 import {
   IonPage,
   onIonViewWillEnter,
@@ -51,7 +53,13 @@ import {Chart, BarController, BarElement, CategoryScale, LinearScale, Title, Too
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
+interface UserMetric {
+  userId: string;
+  totalTokens: number;
+}
+
 const dashboard = ref<Metric[]>([]);
+const userMetrics = ref<UserMetric[]>([]);
 const startDate = ref<string>(subtractMonths(new Date(), 4).toISOString());
 const endDate = ref<string>(new Date().toISOString());
 
@@ -65,11 +73,32 @@ onIonViewWillEnter(async () => {
 const fetchMetrics = async () => {
   try {
     dashboard.value = await getMetricByRangeDate(new Date(startDate.value), new Date(endDate.value));
+    
+    // Process data for both chart and table
     const {labels, data} = processDataForChart(dashboard.value);
     createOrUpdateChart(labels, data);
+    
+    userMetrics.value = processDataForTable(dashboard.value);
+
   } catch (err) {
     console.error("Error fetching or processing metrics:", err);
   }
+};
+
+const processDataForTable = (metrics: Metric[]): UserMetric[] => {
+  const userTokenMap = new Map<string, number>();
+
+  metrics.forEach(metric => {
+    if (metric.userId && metric.totalToken) {
+      const currentTokens = userTokenMap.get(metric.userId.toString()) || 0;
+      userTokenMap.set(metric.userId.toString(), currentTokens + metric.totalToken);
+    }
+  });
+
+  return Array.from(userTokenMap.entries()).map(([userId, totalTokens]) => ({
+    userId,
+    totalTokens
+  }));
 };
 
 const processDataForChart = (metrics: Metric[]): { labels: string[], data: number[] } => {
