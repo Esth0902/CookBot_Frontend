@@ -3,7 +3,7 @@
     <table>
       <thead>
         <tr>
-          <th>User ID</th>
+          <th>Username</th>
           <th @click="toggleSort" class="sortable-header">
             Total Tokens
             <span v-if="sortOrder === 'asc'">▲</span>
@@ -13,8 +13,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in sortedUserData" :key="user.userId">
-          <td>{{ user.userId }}</td>
+        <tr v-for="user in sortedUserData" :key="user.username">
+          <td>{{ user.username }}</td>
           <td>{{ user.totalTokens }}</td>
           <td>
             <div class="bar-container">
@@ -31,7 +31,7 @@
 import { defineProps, computed, ref } from 'vue';
 
 interface UserMetric {
-  userId: string;
+  username: string;
   totalTokens: number;
 }
 

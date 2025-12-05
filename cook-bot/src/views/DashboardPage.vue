@@ -56,7 +56,7 @@ import {Chart, BarController, BarElement, CategoryScale, LinearScale, Title, Too
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
 interface UserMetric {
-  userId: string;
+  username: string;
   totalTokens: number;
 }
 
@@ -90,14 +90,14 @@ const processDataForTable = (metrics: Metric[]): UserMetric[] => {
   const userTokenMap = new Map<string, number>();
 
   metrics.forEach(metric => {
-    if (metric.userId && metric.totalToken) {
-      const currentTokens = userTokenMap.get(metric.userId.toString()) || 0;
-      userTokenMap.set(metric.userId.toString(), currentTokens + metric.totalToken);
+    if (metric.username && metric.totalToken) {
+      const currentTokens = userTokenMap.get(metric.username) || 0;
+      userTokenMap.set(metric.username, currentTokens + metric.totalToken);
     }
   });
 
-  return Array.from(userTokenMap.entries()).map(([userId, totalTokens]) => ({
-    userId,
+  return Array.from(userTokenMap.entries()).map(([username, totalTokens]) => ({
+    username,
     totalTokens
   }));
 };
