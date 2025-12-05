@@ -218,7 +218,7 @@ ion-item {
 
 /* Style the date picker button text */
 ion-datetime-button::part(native) {
-  color: var(--ion-text-color);
+  color: black;
 }
 
 /* Style the calendar that pops up in the modal */
