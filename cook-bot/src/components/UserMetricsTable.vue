@@ -99,7 +99,7 @@ thead tr {
 }
 
 .sortable-header:hover {
-  background-color: var(--ion-color-secondary);
+  background-color: var(--ion-color-primary);
   color: #000;
 }
 
