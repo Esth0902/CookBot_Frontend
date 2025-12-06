@@ -19,6 +19,10 @@
     <div v-for="list in shoppingLists" :key="list.id"
        class="shopping-list">
 
+      <IonButton fill="clear" class="shopping-delete-btn" @click="handleDeleteList(list.id)">
+        <IonIcon :icon="closeOutline" />
+      </IonButton>
+
     <IonInput
         v-model="list.shoppingListName"
         class="shopping-list-title"
@@ -27,8 +31,9 @@
 
 
     <IonButton fill="clear"
-               class="shopping-add-btn">
-      + Ajouter un élément
+               class="shopping-add-btn"
+               @click="handelAddItem(list.id)">
+      + Ajouter un aliment
     </IonButton>
 
     <IonReorderGroup :disabled="false">
@@ -71,14 +76,21 @@ import {
     IonButton,
     IonReorder,
     IonReorderGroup,
-    IonCheckbox
+    IonCheckbox,
+    IonIcon
 
 } from '@ionic/vue';
+import {closeOutline} from "ionicons/icons";
 
 import Header from "@/components/Header.vue";
 import {ref} from 'vue';
 import {onIonViewWillEnter} from "@ionic/vue";
-import {getAllShoppingLists, ShoppingList, createShoppingList} from "@/services/shoppingApi";
+import {
+  getAllShoppingLists,
+  ShoppingList,
+  createShoppingList,
+  deleteShoppingList}
+  from "@/services/shoppingApi";
 
 const shoppingLists = ref<ShoppingList[]>([])
 const loading = ref(true)
@@ -112,6 +124,22 @@ async function handleAddList() {
   }
 }
 
+async function handleDeleteList(id: number) {
+
+  try {
+    await deleteShoppingList(id)
+    shoppingLists.value = shoppingLists.value.filter(list => list.id !== id);
+  }
+  catch (error) {
+    console.error("Erreur suppression :", error);
+    alert("Impossible de supprimer la liste. Veuillez réessayer.");
+  }
+}
+
+async function handelAddItem(listId: number) {
+  const name = prompt("Nom de l'aliment :")
+
+}
 
   </script>
 
@@ -128,11 +156,13 @@ async function handleAddList() {
 
 .shopping-list {
   background: rgba(255, 255, 255, 0.05);
-  padding: 20px;
+  padding: 30px;
   border-radius: 16px;
   backdrop-filter: blur(6px);
   border: 1px solid var(--ion-color-primary);
   margin-bottom: 24px;
+  margin-left: 20px;
+  margin-right: 20px;
   transition: 0.3s;
 }
 
@@ -169,6 +199,15 @@ async function handleAddList() {
 .checked {
   text-decoration: line-through;
   opacity: 0.6;
+}
+
+.shopping-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  --color: var(--ion-color-secondary);
+  font-size: 1.2rem;
 }
 
 </style>

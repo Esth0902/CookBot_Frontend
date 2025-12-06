@@ -35,6 +35,9 @@ export async function createShoppingList(name: string): Promise<ShoppingList> {
 
     const response = await authFetch(`/api/v1/shopping`, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
             shoppingListName: name,
             items: []
@@ -45,18 +48,28 @@ export async function createShoppingList(name: string): Promise<ShoppingList> {
         throw new Error("Erreur lors de la création de la liste");
     }
 
-    const result = await response.json();
+    const result = await response.json() as {
+        success: boolean;
+        responseCode: number;
+        responseMessage: string;
+        data: ShoppingList;
+        items: []
+    };
     return result.data;
 }
 
-export async function addItemToList(listId: number, itemName: string): Promise<ShoppingList> {
+export async function addItemToList(listId: number, itemName: string, itemQuantity: number, itemUnit: string): Promise<ShoppingList> {
 
     const response = await authFetch(`/api/v1/shopping/item/${listId}`, {
     method: 'POST',
-
+    headers: {
+        'Content-Type': 'application/json',
+        },
     body: JSON.stringify({
         name: itemName,
-        checked: false
+        quantity: itemQuantity,
+        unit : itemUnit,
+
     }),
 });
     if (!response.ok) {
