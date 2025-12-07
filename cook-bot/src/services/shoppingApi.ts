@@ -1,10 +1,13 @@
 import { authFetch } from './authApi';
 
+
+
 export interface ShoppingItem {
     id?: number;
     name: string;
     checked: boolean;
     quantity?: string;
+    unit?: string;
 }
 
 export interface ShoppingList {
@@ -118,6 +121,42 @@ export async function updateShoppingList(list: ShoppingList): Promise<ShoppingLi
         responseMessage: string;
         data: ShoppingList;
     };
+    return result.data;
+}
+
+export async function deleteItem(listId: number, itemId: number): Promise<ShoppingList> {
+
+    const response = await authFetch(`/api/v1/shopping/item/${listId}/${itemId}`, {
+        method: 'DELETE',
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.json();
+        const errorMessage = errorBody.responseMessage || "Erreur lors de la suppression de l'aliment";
+        throw new Error(errorMessage);
+    }
+
+    const result = await response.json();
+    return result.data;
+}
+
+export async function updateItem(listId: number, item: ShoppingItem): Promise<ShoppingList> {
+
+    const response = await authFetch(`/api/v1/shopping/item/${listId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(item),
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.json();
+        const errorMessage = errorBody.responseMessage || "Erreur lors de la mise à jour de l'aliment";
+        throw new Error(errorMessage);
+    }
+
+    const result = await response.json();
     return result.data;
 }
 

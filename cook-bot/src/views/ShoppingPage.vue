@@ -2,117 +2,148 @@
   <ion-page>
     <Header />
 
-<ion-content class="shopping-content">
-
-  <IonAlert
-      :is-open="isCreateAlertOpen"
-      :header="'Ajouter une nouvelle liste'"
-      :buttons="createListAlertButtons"
-      :inputs="createListAlertInputs"
-      @didDismiss="isCreateAlertOpen = false"
-  />
-
-  <IonToast
-      :is-open="isToastOpen"
-      :message="toastMessage"
-      :duration="4000"
-      :color="toastColor"
-      position="bottom"
-      @didDismiss="setToastMessage('', false)"
-  />
-
-
-  <h1 class="shopping-title">Mes listes de courses</h1>
-  <div class="add-list-container">
-  <IonButton class="add-list-btn" @click="handleAddList">
-    + Ajouter une liste
-  </IonButton>
-  </div>
-
-  <div v-if="!shoppingLists.length" class="shopping-empty">
-    <p>Aucune liste de courses pour le moment</p>
-
-  </div>
-
-  <div v-else>
-
+    <!-- ALERT NOUVELLE LISTE -->
     <IonAlert
         :is-open="isCreateAlertOpen"
-        :header="'Ajouter une nouvelle liste'"
+        header="Ajouter une nouvelle liste"
         :buttons="createListAlertButtons"
         :inputs="createListAlertInputs"
-        @didDismiss="isCreateAlertOpen = false"
+        @didDismiss="() => (isCreateAlertOpen = false)"
     />
 
+    <!-- ALERT AJOUT ITEM -->
     <IonAlert
         :is-open="isAddItemAlertOpen"
-        :header="'Ajouter un aliment'"
+        header="Ajouter un aliment"
         :buttons="addItemAlertButtons"
         :inputs="addItemAlertInputs"
-        @didDismiss="isAddItemAlertOpen = false"
+        @didDismiss="() => (isAddItemAlertOpen = false)"
     />
 
-    <div v-for="list in shoppingLists" :key="list.id"
-       class="shopping-list">
-
-      <IonToast
-          :is-open="isToastOpen"
-          :message="toastMessage"
-          :duration="4000"
-          :color="toastColor"
-          position="bottom"
-          @didDismiss="setToastMessage('', false)"
-      />
-
-      <IonButton fill="clear" class="shopping-delete-btn" @click="handleDeleteList(list.id)">
-        <IonIcon :icon="closeOutline" />
-      </IonButton>
-
-    <IonInput
-        v-model="list.shoppingListName"
-        class="shopping-list-title"
-        placeholder="Titre de la liste"
-        @ionChange="handelUpdateList(list)"
+    <!-- TOAST -->
+    <IonToast
+        :is-open="isToastOpen"
+        :message="toastMessage"
+        :duration="4000"
+        :color="toastColor"
+        position="bottom"
+        @didDismiss="() => setToastMessage('', false)"
     />
 
+    <ion-content class="shopping-content">
 
-    <IonButton fill="clear"
-               class="shopping-add-btn"
-               @click="handelAddItem(list.id)">
-      + Ajouter un aliment
-    </IonButton>
+      <h1 class="shopping-title">Mes listes de courses</h1>
 
-    <IonReorderGroup :disabled="false">
-      <IonItem
-          v-for="item in list.items"
-          :key="item.id"
-          class="shopping-list-item"
-      >
-        <IonCheckbox
-            :checked="item.checked"
-            class="checkbox"
-        ></IonCheckbox>
+      <div class="add-list-container">
+        <IonButton class="add-list-btn" @click="handleAddList">
+          + Ajouter une liste
+        </IonButton>
+      </div>
 
-        <IonLabel :class="{ checked: item.checked }">
-          <span class="item-details">
-            {{ item.quantity }} {{ item.quantity === 1 ? item.unit?.replace(/s$/, '') : item.unit }}
-          </span>
-          <span class="item-name">
-            {{ item.name }}
-          </span>
-        </IonLabel>
+      <div v-if="!shoppingLists.length" class="shopping-empty">
+        <p>Aucune liste de courses pour le moment</p>
+      </div>
 
-        <IonReorder slot="end"></IonReorder>
-      </IonItem>
-    </IonReorderGroup>
+      <div v-else>
+        <div
+            v-for="list in shoppingLists"
+            :key="list.id"
+            class="shopping-list">
 
-      <p v-if="!list.items?.length" class="shopping-empty-list">
-        Cette liste est vide
-      </p>
-    </div>
-  </div>
+          <!-- SUPPRIMER UNE LISTE -->
+          <IonButton fill="clear" class="shopping-delete-btn"
+                     @click="handleDeleteList(list.id!)">
+            <IonIcon :icon="closeOutline" />
+          </IonButton>
 
-</ion-content >
+          <!-- TITRE LISTE -->
+          <IonInput
+              v-model="list.shoppingListName"
+              class="shopping-list-title"
+              placeholder="Titre de la liste"
+              @ionBlur="handleUpdateList(list)"
+          />
+
+          <!-- AJOUTER UN ITEM -->
+          <IonButton
+              fill="clear"
+              class="shopping-add-btn"
+              @click="handleAddItem(list.id!)">
+            + Ajouter un aliment
+          </IonButton>
+
+          <!-- REORDER -->
+          <IonReorderGroup :disabled="false" @ionItemReorder="(ev) => handleItemReorder(ev, list)">
+            <IonItem
+                v-for="item in list.items"
+                :key="item.id"
+                class="shopping-list-item">
+
+              <!-- CHECKBOX -->
+              <IonCheckbox
+                  slot="start"
+                  v-model="item.checked"
+
+              />
+
+              <!-- AFFICHAGE / EDITION -->
+              <div class="editable-content" :class="{ checked: item.checked }">
+
+                <!-- MODE AFFICHAGE -->
+                <IonLabel
+                    v-if="editingItemId !== item.id"
+                    class="display-mode-label"
+                    @click="activateEditMode(item.id!)">
+
+                  <span class="item-details">{{ item.quantity }} {{ item.unit }}</span>
+                  <span class="item-name">{{ item.name }}</span>
+                </IonLabel>
+
+                <!-- MODE ÉDITION -->
+                <div v-else class="edit-mode-inputs">
+                  <IonInput
+                      v-model="item.quantity"
+                      type="number"
+                      placeholder="Qté"
+                      class="input-quantity"
+                      @ionBlur="handleItemUpdate(list, item)"
+                  />
+                  <IonInput
+                      v-model="item.unit"
+                      type="text"
+                      placeholder="Unité"
+                      class="input-unit"
+                      @ionBlur="handleItemUpdate(list, item)"
+                  />
+                  <IonInput
+                      v-model="item.name"
+                      type="text"
+                      placeholder="Nom de l'aliment"
+                      class="input-name"
+                      @ionBlur="handleItemUpdate(list, item)"
+                  />
+                </div>
+              </div>
+
+              <!-- REORDER HANDLE -->
+              <IonReorder slot="end"></IonReorder>
+
+              <!-- SUPPRIMER ITEM -->
+              <IonButton fill="clear" slot="end"
+                         class="item-delete-btn"
+                         @click="handleDeleteItem(list.id!, item.id!)">
+                <IonIcon :icon="closeOutline" />
+              </IonButton>
+
+            </IonItem>
+          </IonReorderGroup>
+
+          <p v-if="!list.items?.length" class="shopping-empty-list">
+            Cette liste est vide
+          </p>
+        </div>
+      </div>
+    </ion-content>
   </ion-page>
 </template>
 
@@ -122,7 +153,6 @@ import {
     IonContent,
     IonInput,
     IonItem,
-    IonLabel,
     IonButton,
     IonReorder,
     IonReorderGroup,
@@ -139,10 +169,12 @@ import {ref} from 'vue';
 import {onIonViewWillEnter} from "@ionic/vue";
 import {
   getAllShoppingLists,
-  ShoppingList,
+  ShoppingList, ShoppingItem,
   createShoppingList,
   deleteShoppingList,
-  updateShoppingList, addItemToList
+  addItemToList,
+  deleteItem,
+  updateItem, updateShoppingList,
 }
   from "@/services/shoppingApi";
 
@@ -154,6 +186,7 @@ const toastColor = ref("danger");
 const isCreateAlertOpen = ref(false);
 const isAddItemAlertOpen = ref(false);
 const activeListId = ref<number | null>(null);
+const editingItemId = ref<number | null>(null);
 
 const addItemAlertInputs = [
   {
@@ -207,9 +240,26 @@ onIonViewWillEnter(async () => {
   }
     });
 
+function moveArrayElement(arr: any[], from: number, to: number) {
+  const item = arr.splice(from, 1)[0];
+  arr.splice(to, 0, item);
+}
+
+async function handleItemReorder(ev: any, list: ShoppingList) {
+  const from = ev.detail.from;
+  const to = ev.detail.to;
+  const listIndex = shoppingLists.value.findIndex(l => l.id === list.id);
+  if (listIndex === -1) {
+    ev.detail.complete(false);
+    return;
+  }
+
+  moveArrayElement(shoppingLists.value[listIndex].items!, from, to);
+  ev.detail.complete(true);
+}
+
 async function confirmAddList(data: any) {
   const name = data.listName;
-
   if (!name || name.trim() === "") {
     setToastMessage("Le nom de la liste ne peut pas être vide.", true, 'warning');
     return;
@@ -218,8 +268,8 @@ async function confirmAddList(data: any) {
     const newList = await createShoppingList(name);
     shoppingLists.value.push(newList);
     setToastMessage(`Liste '${name}' ajoutée.`, true, 'secondary');
-  }
-  catch (error) {
+    isCreateAlertOpen.value = false;
+  } catch (error) {
     console.error("Erreur création :", error);
     let customMessage: string;
     if (error instanceof Error) {
@@ -265,7 +315,8 @@ async function handleDeleteList(id: number) {
   }
   catch (error) {
     console.error("Erreur suppression :", error);
-    alert("Impossible de supprimer la liste. Veuillez réessayer.");
+    const message = error instanceof Error ? error.message : "Impossible de supprimer la liste.";
+    setToastMessage(message, true, 'danger');
   }
 }
 
@@ -273,7 +324,6 @@ async function confirmAddItem(listId: number, data: any) {
   const name = data.itemName;
   const quantity = parseFloat(data.itemQuantity) || 1;
   const unit = data.itemUnit;
-
   if (!name || name.trim() === "" || quantity <= 0) {
     setToastMessage("Veuillez entrer un nom et une quantité valide.", true, 'warning');
     return;
@@ -281,14 +331,12 @@ async function confirmAddItem(listId: number, data: any) {
 
   try {
     const updatedList = await addItemToList(listId, name, quantity, unit);
-
     const index = shoppingLists.value.findIndex(list => list.id === listId);
-    if (index !== -1) {
-      shoppingLists.value[index] = updatedList;
-      setToastMessage(`'${name}' ajouté(e) à la liste.`, true, 'success');
-    }
-  }
-  catch (error) {
+    if (index !== -1) shoppingLists.value[index] = updatedList;
+    setToastMessage(`'${name}' ajouté(e) à la liste.`, true, 'success');
+    isAddItemAlertOpen.value = false;
+    activeListId.value = null;
+  } catch (error) {
     console.error("Erreur ajout item :", error);
     const message = error instanceof Error ? error.message : "Erreur lors de l'ajout de l'aliment.";
     setToastMessage(message, true, 'danger');
@@ -312,19 +360,66 @@ const addItemAlertButtons = [
 ];
 
 
-async function handelAddItem(listId: number) {
+async function handleAddItem(listId: number) {
   activeListId.value = listId;
   isAddItemAlertOpen.value = true;
 }
 
-async function handelUpdateList(list:ShoppingList) {
+async function handleUpdateList(list:ShoppingList) {
+  if (!list.shoppingListName || list.shoppingListName.trim() === "") {
+    setToastMessage("Le nom de la liste ne peut pas être vide.", true, 'warning');
+    return;}
   try {
-    const updatedList = await updateShoppingList(list);
+    await updateShoppingList(list);
+    setToastMessage(`Titre de la liste mis à jour.`, true, 'secondary');
   }
   catch (error) {
     console.error("Erreur lors de la mise à jour de la liste :", error);
     alert("Impossible de mettre à jour la liste. Veuillez réessayer.");
   }
+}
+
+async function handleDeleteItem(listId: number, itemId: number) {
+  try {
+    const updatedList = await deleteItem(listId, itemId);
+
+    const listIndex = shoppingLists.value.findIndex(l => l.id === listId);
+    if (listIndex !== -1) {
+      shoppingLists.value[listIndex] = updatedList;
+    }
+
+  } catch (error) {
+    console.error("Erreur suppression item :", error);
+  }
+}
+
+async function handleItemUpdate(list: ShoppingList, item: ShoppingItem) {
+
+  editingItemId.value = null;
+
+  if (!item.name || item.name.trim() === "") {
+    setToastMessage("Le nom de l'aliment ne peut être vide.", true, 'warning');
+    return;
+  }
+
+  try {
+    const updatedList = await updateItem(list.id!, item);
+    const listIndex = shoppingLists.value.findIndex(l => l.id === list.id);
+    if (listIndex !== -1) {
+      shoppingLists.value[listIndex] = updatedList;
+    }
+
+    setToastMessage(`Aliment '${item.name}' mis à jour.`, true, 'secondary');
+
+  } catch (error) {
+    console.error("Erreur de mise à jour d'item :", error);
+    const message = error instanceof Error ? error.message : "Impossible de sauvegarder la modification.";
+    setToastMessage(message, true, 'danger');
+  }
+}
+
+function activateEditMode(itemId: number) {
+  editingItemId.value = itemId;
 }
 
   </script>
@@ -363,6 +458,7 @@ async function handelUpdateList(list:ShoppingList) {
   margin-left: 20px;
   margin-right: 20px;
   transition: 0.3s;
+  position: relative;
 }
 
 .shopping-list:hover {
@@ -385,19 +481,31 @@ async function handelUpdateList(list:ShoppingList) {
   --background: transparent;
   border-bottom: 1px solid var(--ion-color-primary);
   padding: 10px 4px;
+  text-align: left;
+}
+
+.shopping-list-item ion-label{
+  flex-grow: 1;
+  text-align: left;
   display: flex;
   align-items: center;
 }
+
 .item-details {
-  font-size: 0.9em; /* Texte un peu plus petit */
-  font-weight: 600;
-  opacity: 0.8; /* Légèrement moins visible */
-  margin-right: 12px; /* Espace après la quantité/unité */
-  color: var(--ion-color-secondary); /* Utiliser une couleur d'accentuation */
+  flex-shrink: 0;
   white-space: nowrap;
+  font-weight: 500;
+  opacity: 0.8;
+  margin-right: 5px;
+  color: var(--ion-color-secondary);
 }
 .item-name {
-  font-weight: 600;
+  flex-grow: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
 }
 
 .shopping-list-item:last-child {
@@ -420,6 +528,26 @@ async function handelUpdateList(list:ShoppingList) {
   z-index: 10;
   --color: var(--ion-color-secondary);
   font-size: 1.2rem;
+}
+.editable-content {
+  display: flex;
+  flex-grow: 1;
+}
+
+.display-mode-label {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden
+}
+
+@media (max-width: 480px) {
+  .shopping-list {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 5px;
+    border-width: 1px;
+  }
 }
 
 </style>
