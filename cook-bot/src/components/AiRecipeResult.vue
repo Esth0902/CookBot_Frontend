@@ -109,12 +109,12 @@ async function onSaveRecipe() {
         <!-- bouton sauvegarde -->
         <div v-if="showSaveButton" class="home-save-wrapper">
           <ion-button
+              class="save-recipe-btn"
               size="small"
-              expand="block"
               :disabled="saving || saveSuccess"
               @click="onSaveRecipe"
           >
-            <span v-if="!saving && !saveSuccess">Sauvegarder la recette</span>
+            <span v-if="!saving && !saveSuccess">Ajouter aux favoris</span>
             <span v-else-if="saving">Sauvegarde...</span>
             <span v-else>Recette sauvegardée ✔️</span>
           </ion-button>
@@ -286,6 +286,23 @@ async function onSaveRecipe() {
   animation: fadeSlideUp 0.6s ease forwards;
 }
 
+.save-recipe-btn {
+  width: auto !important;
+  min-width: 140px;
+  max-width: 200px;
+
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+
+  font-size: 0.85rem;
+  border-radius: 10px;
+
+  margin: 10px auto 0; /* centre le bouton */
+  display: block;
+}
+
 @keyframes fadeSlideUp {
   0% {
     opacity: 0;
@@ -311,6 +328,64 @@ async function onSaveRecipe() {
     grid-template-columns: 1fr 1fr;
     gap: 5px;
     text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .home-card {
+    padding: 15px;
+  }
+
+  .home-card-title {
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+  }
+
+  .home-card-text {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+
+  .recipe-section {
+    margin-top: 12px;
+  }
+
+  .recipe-title {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .recipe-list li,
+  .recipe-steps li {
+    font-size: 0.9rem;
+    padding: 4px 0;
+  }
+
+  .save-recipe-btn {
+    min-width: 120px;
+    --padding-start: 10px;
+    --padding-end: 10px;
+    --padding-top: 4px;
+    --padding-bottom: 4px;
+    font-size: 0.75rem;
+  }
+
+  .recipe-ideas-list {
+    gap: 8px;
+  }
+
+  .recipe-idea-item {
+    padding: 10px;
+  }
+
+  .recipe-idea-title {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+
+  .recipe-idea-duration {
+    font-size: 0.8rem;
   }
 }
 </style>

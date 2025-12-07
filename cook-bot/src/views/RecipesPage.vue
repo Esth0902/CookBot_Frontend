@@ -97,24 +97,25 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
 
 
 </script>
+
 <template>
   <ion-page>
     <Header />
 
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Recettes</ion-title>
+    <ion-content fullscreen class="recipes-content">
 
-        </ion-toolbar>
-      </ion-header>
+      <!-- SECTION : INGREDIENTS -->
+      <section class="recipes-section">
+        <div class="recipes-card">
 
-      <ion-card class="ion-margin">
-        <ion-card-header>
-          <ion-card-title>Ingrédients dans mon frigo</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item v-for="(ing, index) in manualIngredients" :key="index">
+          <h2 class="recipes-card-title">Générer une recette à partir d'ingrédients</h2>
+
+          <!-- INPUTS D'INGRÉDIENTS -->
+          <div
+              class="recipes-input-row"
+              v-for="(ing, index) in manualIngredients"
+              :key="index"
+          >
             <ion-input
                 label="Nom"
                 label-placement="stacked"
@@ -132,85 +133,103 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
                 label="Unité"
                 label-placement="stacked"
                 v-model="ing.unit"
-                placeholder="pièces, g, ml..."
+                placeholder="g, ml, pièces…"
             />
+
             <ion-button
                 fill="clear"
-                color="danger"
+                class="delete-icon-btn"
                 @click="removeIngredientRow(index)"
                 :disabled="manualIngredients.length === 1"
             >
-              X
+              <ion-icon :icon="closeOutline" />
             </ion-button>
-          </ion-item>
+          </div>
 
+          <!-- AJOUTER UN INGREDIENT -->
           <ion-button
               expand="block"
               fill="outline"
-              class="ion-margin-top"
+              class="recipes-btn recipes-btn-secondary ion-margin-top"
               @click="addIngredientRow"
           >
             Ajouter un ingrédient
           </ion-button>
 
+          <!-- GENERER TITRES -->
           <ion-button
               expand="block"
-              class="ion-margin-top"
+              class="recipes-btn ion-margin-top"
               :disabled="loadingAi || manualIngredientsCleaned.length === 0"
               @click="handleGenerateRecipeTitleFromManual"
           >
-            <span v-if="!loadingAi">Générer des idées de recettes</span>
-            <span v-else>Génération en cours...</span>
+            <span v-if="!loadingAi">Idées de recettes</span>
+            <span v-else>Génération…</span>
           </ion-button>
+
+          <!-- GENERER RECETTE COMPLETE -->
           <ion-button
               expand="block"
-              class="ion-margin-top"
+              class="recipes-btn ion-margin-top"
               :disabled="loadingAi || manualIngredientsCleaned.length === 0"
               @click="handleGenerateRecipeFromManual"
           >
-            <span v-if="!loadingAi">Générer une recette complète</span>
-            <span v-else>Génération en cours...</span>
+            <span v-if="!loadingAi">Recette complète</span>
+            <span v-else>Génération…</span>
           </ion-button>
-        </ion-card-content>
-      </ion-card>
-      <ion-card class="ion-margin">
-        <ion-card-header>
-          <ion-card-title>À partir d’un plat</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item>
+        </div>
+
+        <div class="recipes-separator">
+          <img src="/wave1.png" alt="separator">
+        </div>
+      </section>
+
+
+
+      <!-- SECTION : DISH INPUT -->
+      <section class="recipes-section">
+        <div class="recipes-card">
+          <h2 class="recipes-card-title">Générer une recette à partir d’un plat</h2>
+
+          <ion-item class="recipes-input-row">
             <ion-input
-                label="Nom du plat"
                 label-placement="stacked"
                 v-model="dishValue"
-                placeholder="Omelette au fromage, pasta carbonara…"
+                placeholder="Ecrivez l'intitulé de la recette"
             />
           </ion-item>
 
           <ion-button
               expand="block"
-              class="ion-margin-top"
+              class="recipes-btn ion-margin-top"
               :disabled="loadingAi || dishValueCleaned.length === 0"
               @click="handleGenerateRecipeFromDish"
           >
-            <span v-if="!loadingAi">Générer une recette depuis ce plat</span>
-            <span v-else>Génération en cours...</span>
+            <span v-if="!loadingAi">Générer une recette</span>
+            <span v-else>Génération…</span>
           </ion-button>
-        </ion-card-content>
-      </ion-card>
+        </div>
 
-      <ion-card class="ion-margin">
-        <ion-card-header>
-          <ion-card-title>Mes recettes sauvegardées</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <div v-if="recipeError" class="ion-padding-top">
+        <div class="recipes-separator">
+          <img src="/wave1.png" alt="separator">
+        </div>
+      </section>
+
+
+
+      <!-- SECTION : RECETTES SAUVEGARDEES -->
+      <section class="recipes-section">
+        <div class="recipes-card">
+          <h2 class="recipes-card-title">Mes recettes sauvegardées</h2>
+
+          <div v-if="recipeError">
             <ion-text color="danger">
               <p>{{ recipeError }}</p>
             </ion-text>
           </div>
 
           <ion-list v-if="recipes.length">
+
             <div
                 v-for="rec in recipes"
                 :key="rec.id"
@@ -220,22 +239,23 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
                   <h3 class="recipe-title-clickable">{{ rec.name }}</h3>
                 </ion-label>
 
+                <!-- FAVORI -->
                 <ion-button
                     slot="end"
-                    size="small"
                     fill="clear"
-                    :color="rec.isFavorite ? 'danger' : 'medium'"
+                    :color="rec.isFavorite ? 'secondary' : 'medium'"
                     :disabled="togglingFavoriteID === rec.id"
                     @click.stop="toggleFavorite(rec)"
+                    class="recipes-favorite-btn"
                 >
                   <ion-icon :icon="rec.isFavorite ? heart : heartOutline" />
                 </ion-button>
 
+                <!-- SUPPRIMER -->
                 <ion-button
+                    class="delete-icon-btn"
                     slot="end"
-                    size="small"
                     fill="clear"
-                    color="danger"
                     :disabled="deletingRecipeID === rec.id"
                     @click.stop="removeRecipe(rec)"
                 >
@@ -243,9 +263,10 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
                 </ion-button>
               </ion-item>
 
+              <!-- ZONE DÉPLIÉE -->
               <div
                   v-if="expandedRecipeId === rec.id"
-                  class="ion-padding-start ion-padding-end ion-padding-bottom"
+                  class="recipes-expand-area"
               >
                 <AiRecipeResult
                     :ai-error="''"
@@ -253,19 +274,20 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
                     :ai-recipe-titles="null"
                 />
               </div>
+
             </div>
           </ion-list>
 
-          <p v-else-if="!loadingRecipes" class="ion-padding-top">
-            Aucune recette pour l’instant.
-          </p>
-        </ion-card-content>
-      </ion-card>
+          <p v-else>Aucune recette pour l’instant.</p>
+        </div>
+
+        <div class="recipes-separator">
+          <img src="/wave1.png" alt="separator">
+        </div>
+      </section>
 
 
-
-
-
+      <!-- IA RESULTAT -->
       <AiRecipeResult
           :ai-error="aiError"
           :ai-recipe="aiRecipe"
@@ -277,4 +299,155 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
     </ion-content>
   </ion-page>
 </template>
+
+<style scoped>
+.recipes-content {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding-bottom: 120px;
+}
+
+/* Sections */
+.recipes-section {
+  padding: 10px 10px;
+}
+
+/* CARDS */
+.recipes-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--ion-color-primary);
+  text-align: center;
+  transition: 0.3s;
+}
+
+.recipes-card:hover {
+  transform: translateY(-4px);
+}
+
+.recipes-card-title {
+  color: var(--ion-color-light);
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* SEPARATEUR */
+.recipes-separator img {
+  width: 230px;
+  margin: 15px auto 0;
+  display: block;
+}
+
+/* INPUT ROW */
+.recipes-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  margin-top: 12px;
+}
+
+/* DELETE BUTTON */
+.delete-icon-btn {
+  --color: var(--ion-color-primary);
+  --padding-start: 4px;
+  --padding-end: 4px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+}
+
+.delete-icon-btn ion-icon {
+  font-size: 22px;
+}
+
+.delete-icon-btn:hover {
+  transform: scale(1.1);
+}
+/* BUTTONS */
+.recipes-btn {
+  --background: var(--ion-color-primary);
+  --background-hover: var(--ion-color-tertiary);
+  --border-radius: 10px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  color: var(--ion-text-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  max-width: 260px;
+  margin: 8px auto 0;
+}
+
+.recipes-btn-secondary {
+  --background: var(--ion-color-secondary);
+  --background-hover: var(--ion-color-light);
+}
+
+.recipes-btn:disabled {
+  opacity: 0.5;
+}
+
+/* LISTE DE RECETTES */
+.recipe-title-clickable {
+  font-size: 1.1rem;
+  color: var(--ion-color-light);
+  transition: 0.2s;
+}
+
+.recipe-title-clickable:hover {
+  color: var(--ion-color-primary);
+}
+
+/* FAVORI BTN */
+.recipes-favorite-btn {
+  font-size: 26px;
+  transition: 0.2s;
+}
+
+.recipes-favorite-btn:hover {
+  transform: scale(1.15);
+}
+
+/* ZONE EXPAND */
+.recipes-expand-area {
+  margin-top: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--ion-color-primary);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+/* RESPONSIVE */
+@media (min-width: 768px) {
+  .recipes-input-row {
+    gap: 18px;
+  }
+}
+
+@media (min-width: 900px) {
+  .recipes-input-row {
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+</style>
 

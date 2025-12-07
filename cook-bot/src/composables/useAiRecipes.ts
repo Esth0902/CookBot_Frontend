@@ -129,7 +129,6 @@ export function useAiRecipes() {
         getRecipeFromIngredients,
         getTitlesFromImage,
         getRecipeFromImage,
-        setRecipeFromFavorite,
         getRecipeFromDish,
     };
 }
