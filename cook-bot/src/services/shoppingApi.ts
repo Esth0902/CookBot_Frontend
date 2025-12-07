@@ -45,8 +45,9 @@ export async function createShoppingList(name: string): Promise<ShoppingList> {
     });
 
     if (!response.ok) {
-        throw new Error("Erreur lors de la création de la liste");
-    }
+        const errorBody = await response.json();
+        const errorMessage = errorBody.responseMessage || "Erreur lors de la création de la liste";
+        throw new Error(errorMessage);}
 
     const result = await response.json() as {
         success: boolean;
@@ -73,7 +74,9 @@ export async function addItemToList(listId: number, itemName: string, itemQuanti
     }),
 });
     if (!response.ok) {
-        throw new Error('Erreur lors de l\'ajout de l\'item');
+        const errorBody = await response.json();
+        const errorMessage = errorBody.responseMessage || "Erreur lors de l'ajout de l'item";
+        throw new Error(errorMessage);
     }
 
     const result = await response.json();
@@ -90,3 +93,32 @@ export async function deleteShoppingList(listId: number): Promise<void> {
         throw new Error('Erreur lors de la suppression');
     }
 }
+
+export async function updateShoppingList(list: ShoppingList): Promise<ShoppingList> {
+
+    if (!list.id) {
+        throw new Error("L'ID de la liste de courses est manquant pour la mise à jour.");
+    }
+
+    const response = await authFetch(`/api/v1/shopping`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(list),
+    });
+
+    if (!response.ok) {
+        throw new Error("Erreur lors de la mise à jour du nom de la liste");
+    }
+
+    const result = await response.json() as {
+        success: boolean;
+        responseCode: number;
+        responseMessage: string;
+        data: ShoppingList;
+    };
+    return result.data;
+}
+
+

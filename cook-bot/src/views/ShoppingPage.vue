@@ -4,10 +4,30 @@
 
 <ion-content class="shopping-content">
 
+  <IonAlert
+      :is-open="isCreateAlertOpen"
+      :header="'Ajouter une nouvelle liste'"
+      :buttons="createListAlertButtons"
+      :inputs="createListAlertInputs"
+      @didDismiss="isCreateAlertOpen = false"
+  />
+
+  <IonToast
+      :is-open="isToastOpen"
+      :message="toastMessage"
+      :duration="4000"
+      :color="toastColor"
+      position="bottom"
+      @didDismiss="setToastMessage('', false)"
+  />
+
+
   <h1 class="shopping-title">Mes listes de courses</h1>
+  <div class="add-list-container">
   <IonButton class="add-list-btn" @click="handleAddList">
     + Ajouter une liste
   </IonButton>
+  </div>
 
   <div v-if="!shoppingLists.length" class="shopping-empty">
     <p>Aucune liste de courses pour le moment</p>
@@ -16,8 +36,33 @@
 
   <div v-else>
 
+    <IonAlert
+        :is-open="isCreateAlertOpen"
+        :header="'Ajouter une nouvelle liste'"
+        :buttons="createListAlertButtons"
+        :inputs="createListAlertInputs"
+        @didDismiss="isCreateAlertOpen = false"
+    />
+
+    <IonAlert
+        :is-open="isAddItemAlertOpen"
+        :header="'Ajouter un aliment'"
+        :buttons="addItemAlertButtons"
+        :inputs="addItemAlertInputs"
+        @didDismiss="isAddItemAlertOpen = false"
+    />
+
     <div v-for="list in shoppingLists" :key="list.id"
        class="shopping-list">
+
+      <IonToast
+          :is-open="isToastOpen"
+          :message="toastMessage"
+          :duration="4000"
+          :color="toastColor"
+          position="bottom"
+          @didDismiss="setToastMessage('', false)"
+      />
 
       <IonButton fill="clear" class="shopping-delete-btn" @click="handleDeleteList(list.id)">
         <IonIcon :icon="closeOutline" />
@@ -27,6 +72,7 @@
         v-model="list.shoppingListName"
         class="shopping-list-title"
         placeholder="Titre de la liste"
+        @ionChange="handelUpdateList(list)"
     />
 
 
@@ -48,7 +94,12 @@
         ></IonCheckbox>
 
         <IonLabel :class="{ checked: item.checked }">
-          {{ item.name }}
+          <span class="item-details">
+            {{ item.quantity }} {{ item.quantity === 1 ? item.unit?.replace(/s$/, '') : item.unit }}
+          </span>
+          <span class="item-name">
+            {{ item.name }}
+          </span>
         </IonLabel>
 
         <IonReorder slot="end"></IonReorder>
@@ -62,7 +113,6 @@
   </div>
 
 </ion-content >
-
   </ion-page>
 </template>
 
@@ -77,7 +127,9 @@ import {
     IonReorder,
     IonReorderGroup,
     IonCheckbox,
-    IonIcon
+    IonIcon,
+    IonAlert,
+    IonToast,
 
 } from '@ionic/vue';
 import {closeOutline} from "ionicons/icons";
@@ -89,11 +141,57 @@ import {
   getAllShoppingLists,
   ShoppingList,
   createShoppingList,
-  deleteShoppingList}
+  deleteShoppingList,
+  updateShoppingList, addItemToList
+}
   from "@/services/shoppingApi";
 
 const shoppingLists = ref<ShoppingList[]>([])
 const loading = ref(true)
+const isToastOpen = ref(false);
+const toastMessage = ref("");
+const toastColor = ref("danger");
+const isCreateAlertOpen = ref(false);
+const isAddItemAlertOpen = ref(false);
+const activeListId = ref<number | null>(null);
+
+const addItemAlertInputs = [
+  {
+    placeholder: "Nom de l'aliment (ex: Lait)",
+    name: 'itemName',
+    type: 'text',
+    id: 'item-name-input',
+  },
+  {
+    placeholder: "Quantité (ex: 2)",
+    name: 'itemQuantity',
+    type: 'number', // Utilisation de type: 'number' pour la quantité
+    id: 'item-quantity-input',
+    value: 1,
+  },
+  {
+    placeholder: "Unité (ex: litres, paquets)",
+    name: 'itemUnit',
+    type: 'text',
+    id: 'item-unit-input',
+    value: 'unité(s)',
+  },
+];
+
+const createListAlertInputs = [
+  {
+    placeholder: "Titre de la nouvelle liste",
+    name: 'listName',
+    type: 'text',
+    id: 'list-name-input',
+  },
+];
+
+function setToastMessage(message: string, isOpen: boolean, color: string = 'danger') {
+  toastMessage.value = message;
+  isToastOpen.value = isOpen;
+  toastColor.value = color;
+}
 
 onIonViewWillEnter(async () => {
   loading.value = true;
@@ -109,19 +207,54 @@ onIonViewWillEnter(async () => {
   }
     });
 
-async function handleAddList() {
-  const name = prompt("Nom de la nouvelle liste :");
+async function confirmAddList(data: any) {
+  const name = data.listName;
 
   if (!name || name.trim() === "") {
+    setToastMessage("Le nom de la liste ne peut pas être vide.", true, 'warning');
     return;
   }
-
   try {
     const newList = await createShoppingList(name);
     shoppingLists.value.push(newList);
-  } catch (error) {
-    console.error("Erreur création :", error);
+    setToastMessage(`Liste '${name}' ajoutée.`, true, 'secondary');
   }
+  catch (error) {
+    console.error("Erreur création :", error);
+    let customMessage: string;
+    if (error instanceof Error) {
+      customMessage = error.message;
+    } else {
+      customMessage = "Erreur inconnue lors de la création.";
+    }
+
+    if (customMessage.includes("Internal Server Error") || customMessage.includes("Erreur lors de la création de la liste")) {
+      customMessage = "Attention : Vous avez atteint la limite de 5 listes de courses !";
+    }
+
+    setToastMessage(customMessage, true, 'danger');
+  }
+}
+
+const createListAlertButtons = [
+  {
+    text: 'Annuler',
+    role: 'cancel',
+    handler: () => {
+      console.log('Création annulée');
+    },
+  },
+  {
+    text: 'Ajouter',
+    role: 'confirm',
+    handler: (data: any) => {
+      confirmAddList(data);
+    },
+  },
+];
+
+async function handleAddList() {
+  isCreateAlertOpen.value = true;
 }
 
 async function handleDeleteList(id: number) {
@@ -136,18 +269,84 @@ async function handleDeleteList(id: number) {
   }
 }
 
-async function handelAddItem(listId: number) {
-  const name = prompt("Nom de l'aliment :")
+async function confirmAddItem(listId: number, data: any) {
+  const name = data.itemName;
+  const quantity = parseFloat(data.itemQuantity) || 1;
+  const unit = data.itemUnit;
 
+  if (!name || name.trim() === "" || quantity <= 0) {
+    setToastMessage("Veuillez entrer un nom et une quantité valide.", true, 'warning');
+    return;
+  }
+
+  try {
+    const updatedList = await addItemToList(listId, name, quantity, unit);
+
+    const index = shoppingLists.value.findIndex(list => list.id === listId);
+    if (index !== -1) {
+      shoppingLists.value[index] = updatedList;
+      setToastMessage(`'${name}' ajouté(e) à la liste.`, true, 'success');
+    }
+  }
+  catch (error) {
+    console.error("Erreur ajout item :", error);
+    const message = error instanceof Error ? error.message : "Erreur lors de l'ajout de l'aliment.";
+    setToastMessage(message, true, 'danger');
+  }
+}
+
+const addItemAlertButtons = [
+  {
+    text: 'Annuler',
+    role: 'cancel',
+  },
+  {
+    text: 'Ajouter',
+    role: 'confirm',
+    handler: (data: any) => {
+      if (activeListId.value !== null) {
+        confirmAddItem(activeListId.value, data);
+      }
+    },
+  },
+];
+
+
+async function handelAddItem(listId: number) {
+  activeListId.value = listId;
+  isAddItemAlertOpen.value = true;
+}
+
+async function handelUpdateList(list:ShoppingList) {
+  try {
+    const updatedList = await updateShoppingList(list);
+  }
+  catch (error) {
+    console.error("Erreur lors de la mise à jour de la liste :", error);
+    alert("Impossible de mettre à jour la liste. Veuillez réessayer.");
+  }
 }
 
   </script>
 
 <style scoped>
 
+.shopping-title {
+  text-align: center;
+  color: var(--ion-color-light);
+  margin-bottom: 30px;
+}
+
+.add-list-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
 .add-list-btn {
   margin-bottom: 20px;
-  --color: var(--ion-color-secondary);
+  --color: var(--ion-text-color);
+  --background: var(--ion-color-secondary);
 }
 
 .shopping-content {
@@ -186,6 +385,19 @@ async function handelAddItem(listId: number) {
   --background: transparent;
   border-bottom: 1px solid var(--ion-color-primary);
   padding: 10px 4px;
+  display: flex;
+  align-items: center;
+}
+.item-details {
+  font-size: 0.9em; /* Texte un peu plus petit */
+  font-weight: 600;
+  opacity: 0.8; /* Légèrement moins visible */
+  margin-right: 12px; /* Espace après la quantité/unité */
+  color: var(--ion-color-secondary); /* Utiliser une couleur d'accentuation */
+  white-space: nowrap;
+}
+.item-name {
+  font-weight: 600;
 }
 
 .shopping-list-item:last-child {
