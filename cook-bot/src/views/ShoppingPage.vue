@@ -198,7 +198,7 @@ const addItemAlertInputs = [
   {
     placeholder: "Quantité (ex: 2)",
     name: 'itemQuantity',
-    type: 'number', // Utilisation de type: 'number' pour la quantité
+    type: 'number',
     id: 'item-quantity-input',
     value: 1,
   },
@@ -333,7 +333,7 @@ async function confirmAddItem(listId: number, data: any) {
     const updatedList = await addItemToList(listId, name, quantity, unit);
     const index = shoppingLists.value.findIndex(list => list.id === listId);
     if (index !== -1) shoppingLists.value[index] = updatedList;
-    setToastMessage(`'${name}' ajouté(e) à la liste.`, true, 'success');
+    setToastMessage(`'${name}' ajouté(e) à la liste.`, true, 'secondary');
     isAddItemAlertOpen.value = false;
     activeListId.value = null;
   } catch (error) {
@@ -381,15 +381,19 @@ async function handleUpdateList(list:ShoppingList) {
 
 async function handleDeleteItem(listId: number, itemId: number) {
   try {
-    const updatedList = await deleteItem(listId, itemId);
+    await deleteItem(itemId);
 
     const listIndex = shoppingLists.value.findIndex(l => l.id === listId);
     if (listIndex !== -1) {
-      shoppingLists.value[listIndex] = updatedList;
+      shoppingLists.value[listIndex].items =
+          shoppingLists.value[listIndex].items?.filter(i => i.id !== itemId);
     }
+
+    setToastMessage("Aliment supprimé.", true, "secondary");
 
   } catch (error) {
     console.error("Erreur suppression item :", error);
+    setToastMessage("Impossible de supprimer l'aliment.", true, "danger");
   }
 }
 

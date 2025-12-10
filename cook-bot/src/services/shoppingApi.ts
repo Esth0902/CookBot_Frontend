@@ -8,6 +8,7 @@ export interface ShoppingItem {
     checked: boolean;
     quantity?: string;
     unit?: string;
+    sequence?: number;
 }
 
 export interface ShoppingList {
@@ -124,9 +125,9 @@ export async function updateShoppingList(list: ShoppingList): Promise<ShoppingLi
     return result.data;
 }
 
-export async function deleteItem(listId: number, itemId: number): Promise<ShoppingList> {
+export async function deleteItem(itemId: number): Promise<ShoppingList> {
 
-    const response = await authFetch(`/api/v1/shopping/item/${listId}/${itemId}`, {
+    const response = await authFetch(`/api/v1/shopping/item/delete/${itemId}`, {
         method: 'DELETE',
     });
 
