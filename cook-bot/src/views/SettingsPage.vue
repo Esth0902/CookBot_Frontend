@@ -101,36 +101,50 @@
 </template>
 
 <script setup lang="ts">
-import { IonLabel, IonIcon, IonPage, IonToast, IonChip, IonContent,IonInput,IonList, IonToggle, IonTitle, IonToolbar, IonHeader, IonListHeader, IonButton, IonBadge, IonItem } from '@ionic/vue';
-import { reactive, ref, watch, onMounted } from 'vue'
-import { Preferences } from '@capacitor/preferences'
-import { Haptics, ImpactStyle } from '@capacitor/haptics'
-import { add, remove, close, checkmark, alertCircle } from 'ionicons/icons'
-import LogoutButton from "@/components/LogoutButton.vue";
+import {
+  IonLabel,
+  IonIcon,
+  IonPage,
+  IonToast,
+  IonChip,
+  IonContent,
+  IonInput,
+  IonToggle,
+  IonButton,
+  IonBadge,
+  onIonViewWillEnter,
+} from '@ionic/vue';
+import { reactive, ref } from 'vue';
+import { add, remove, close, checkmark, alertCircle } from 'ionicons/icons';
 import Header from "@/components/Header.vue";
-
-const STORAGE_KEY = 'cookbot.settings.v1'
+import {
+  getUserPreferences,
+  getUserSetting,
+  updateUserNbPeople,
+  addUserPreferences,
+  deleteUserPreferenceByName, UserPreference,
+} from "@/services/settingsAPI";
 
 interface Settings {
-  servings: number
-  applyFiltersInSearch: boolean
-  allergens: string[]
-  avoidList: string[]
-  plan: 'free' | 'premium'
+  servings: number;
+  applyFiltersInSearch: boolean;
+  allergens: string[];
+  avoidList: string[];
+  plan: 'free' | 'premium';
 }
 
 const defaultSettings: Settings = {
-  servings: 2,
+  servings: 1,
   applyFiltersInSearch: true,
   allergens: [],
   avoidList: [],
   plan: 'free',
-}
+};
 
-const settings = reactive<Settings>({ ...defaultSettings })
-const dirty = ref(false)
-const newAvoid = ref('')
-const toast = reactive({ open: false, message: '' })
+const settings = reactive<Settings>({ ...defaultSettings });
+const newAvoid = ref('');
+const toast = reactive({ open: false, message: '' });
+const originalAllergens = ref<string[]>([]);
 
 const commonAllergens = [
   'Gluten',
@@ -140,92 +154,127 @@ const commonAllergens = [
   'Fruits à coque',
   'Soja',
   'Crustacés',
-]
+];
 
-function buzz() {
-  Haptics.impact({ style: ImpactStyle.Light }).catch(() => {})
+function applyPreferencesFromBackend(prefs: UserPreference[]) {
+  const allValues = prefs.map(p => p.allergen);
+  settings.allergens = allValues.filter(a => commonAllergens.includes(a));
+  settings.avoidList = allValues.filter(a => !commonAllergens.includes(a));
+  originalAllergens.value = [... allValues];
 }
-function markDirty() {
-  dirty.value = true
+
+async function reloadPreferences() {
+  const prefs = await getUserPreferences();
+  applyPreferencesFromBackend(prefs);
 }
+
+onIonViewWillEnter(async () => {
+  try {
+    const [backendSettings, prefs] = await Promise.all([
+      getUserSetting(),
+      getUserPreferences(),
+    ]);
+
+    settings.servings = backendSettings.nbPeople ?? defaultSettings.servings;
+    applyPreferencesFromBackend(prefs);
+  } catch (e) {
+    console.error(e);
+    toast.message = "Impossible de charger les réglages";
+    toast.open = true;
+  }
+});
 
 function toggleApplyFilters(ev: CustomEvent) {
-  settings.applyFiltersInSearch = !!(ev as any).detail.checked
-  markDirty()
+  settings.applyFiltersInSearch = !!(ev as any).detail.checked;
 }
+
 function incServings() {
-  settings.servings = Math.min(12, settings.servings + 1)
-  buzz()
-  markDirty()
+  settings.servings = Math.min(12, settings.servings + 1);
 }
+
 function decServings() {
-  settings.servings = Math.max(1, settings.servings - 1)
-  buzz()
-  markDirty()
-}
-function toggleAllergen(a: string) {
-  const idx = settings.allergens.indexOf(a)
-  if (idx >= 0) settings.allergens.splice(idx, 1)
-  else settings.allergens.push(a)
-  markDirty()
-}
-function addAvoid() {
-  const val = newAvoid.value.trim()
-  if (!val) return
-  if (!settings.avoidList.includes(val)) settings.avoidList.push(val)
-  newAvoid.value = ''
-  markDirty()
-}
-function removeAvoid(i: number) {
-  settings.avoidList.splice(i, 1)
-  markDirty()
+  settings.servings = Math.max(1, settings.servings - 1);
 }
 
-async function loadSettings() {
+async function addAvoid() {
+  const val = newAvoid.value.trim();
+  if (!val) return;
+
+  if (settings.avoidList.includes(val) || settings.allergens.includes(val)) {
+    newAvoid.value = '';
+    return;
+  }
+
+  settings.avoidList.push(val);
+  newAvoid.value = '';
+}
+
+async function removeAvoid(i: number) {
+  settings.avoidList.splice(i, 1);
+}
+
+async function toggleAllergen(a: string) {
+  const idx = settings.allergens.indexOf(a);
+  if (idx >= 0) {
+    settings.allergens.splice(idx, 1);
+  } else {
+    settings.allergens.push(a);
+  }
+}
+
+function getCurrentAllergens(): string[] {
+  return Array.from(new Set([...settings.allergens, ...settings.avoidList]));
+}
+
+async function saveNow() {
   try {
-    const { value } = await Preferences.get({ key: STORAGE_KEY })
-    if (value) {
-      const parsed = JSON.parse(value)
-      Object.assign(settings, { ...defaultSettings, ...parsed })
+    await updateUserNbPeople(settings.servings);
+    const current = getCurrentAllergens();
+    const original = originalAllergens.value;
+    const toAdd = current.filter(a => !original.includes(a));
+    const toDelete = original.filter(a => !current.includes(a));
+
+    if (toAdd.length) {
+      await addUserPreferences(toAdd);
     }
+
+    for (const name of toDelete) {
+      await deleteUserPreferenceByName(name);
+    }
+
+    originalAllergens.value = [...current];
+
+    toast.message = 'Réglages enregistrés';
   } catch (e) {
-    console.warn('Failed to load settings', e)
+    console.error(e);
+    toast.message = "Erreur lors de l'enregistrement";
+  } finally {
+    toast.open = true;
   }
 }
-async function saveSettings() {
+
+async function resetAll() {
+  settings.servings = defaultSettings.servings;
+  settings.allergens = [];
+  settings.avoidList = [];
+
   try {
-    await Preferences.set({ key: STORAGE_KEY, value: JSON.stringify(settings) })
-    dirty.value = false
-    toast.message = 'Réglages enregistrés'
-    toast.open = true
+    await updateUserNbPeople(settings.servings);
+
+    const original = originalAllergens.value;
+    for (const name of original) {
+      await deleteUserPreferenceByName(name);
+    }
+    originalAllergens.value = [];
+
+    toast.message = 'Réglages réinitialisés';
   } catch (e) {
-    toast.message = "Erreur d'enregistrement"
-    toast.open = true
+    console.error(e);
+    toast.message = "Erreur lors de la réinitialisation";
+  } finally {
+    toast.open = true;
   }
 }
-
-let saveTimer: number | undefined
-watch(
-    settings,
-    () => {
-      clearTimeout(saveTimer)
-      saveTimer = window.setTimeout(() => {
-        if (dirty.value) saveSettings()
-      }, 2500)
-    },
-    { deep: true }
-)
-
-function saveNow() {
-  saveSettings()
-}
-
-function resetAll() {
-  Object.assign(settings, { ...defaultSettings })
-  saveSettings()
-}
-
-onMounted(loadSettings)
 
 </script>
 
