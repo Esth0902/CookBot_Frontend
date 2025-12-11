@@ -12,10 +12,6 @@ export interface Step {
     description: string;
 }
 
-export interface TipsGroup {
-    tips: string[];
-}
-
 export interface Recipe {
     id: number;
     name: string;
@@ -23,7 +19,7 @@ export interface Recipe {
     isFavorite?: boolean;
     ingredients: Ingredient[];
     steps: Step[];
-    tips?: TipsGroup[];
+    tips?: { tips: string[] }[];
 }
 
 export interface Metric {

@@ -14,7 +14,7 @@ import { jwtDecode} from "jwt-decode";
 import {computed, ref} from "vue";
 import PricingComponent from "@/components/PricingComponent.vue";
 import {generateDailyRecipe} from "@/services/aiAPI";
-import type {Recipe} from '@/types/Recipe';
+import type {Recipe} from '@/services/aiAPI';
 
 const userRole = ref("FREE");
 const username = ref("Utilisateur");
