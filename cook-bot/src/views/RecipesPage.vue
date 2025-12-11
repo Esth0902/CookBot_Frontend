@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import {
-  IonButton, IonCard,
-  IonCardContent,
-  IonCardHeader, IonCardTitle, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList,
-  IonPage, IonText, IonTitle, IonToolbar, onIonViewWillEnter,
+  IonButton, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonList,
+  IonPage, IonText, onIonViewWillEnter,
 } from '@ionic/vue';
 import { computed, ref } from 'vue';
 import type {IngredientInput, Recipe} from '@/services/aiAPI';
@@ -24,7 +22,6 @@ const {
 } = useAiRecipes();
 
 const {
-  loadingRecipes,
   recipeError,
   recipes,
   fetchRecipes,
@@ -47,11 +44,6 @@ function toggleExpanded(rec: Recipe) {
     expandedRecipeId.value = rec.id;
   }
 }
-
-function onToggleRecipeFavorite(rec: Recipe) {
-  toggleFavorite(rec);
-}
-
 
 const manualIngredients = ref<IngredientInput[]>([
   { name: '', quantity: 0, unit: '' },

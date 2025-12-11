@@ -89,7 +89,6 @@ import AiRecipeResult from '@/components/AiRecipeResult.vue';
 
 const {
   loadingRecipes,
-  recipeError,
   favoriteRecipes,
   togglingFavoriteID,
   fetchRecipes,
