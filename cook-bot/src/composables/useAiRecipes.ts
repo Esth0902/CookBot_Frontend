@@ -99,12 +99,6 @@ export function useAiRecipes() {
         );
     }
 
-    function setRecipeFromFavorite(recipe: Recipe) {
-        aiError.value = '';
-        aiRecipeTitles.value = null;
-        aiRecipe.value = recipe;
-    }
-
     async function getRecipeFromDish(dish: string) {
         if (!dish || !dish.trim()) {
             aiError.value = 'Entre un nom de plat';

@@ -1,5 +1,5 @@
-import { ref, onMounted, watch } from 'vue';
-import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
+import { ref } from 'vue';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 export const usePhotoGallery = () => {
     const photos = ref<UserPhoto[]>([]);

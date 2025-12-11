@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <Header />
+    <HeaderComponent />
 
     <!-- ALERT NOUVELLE LISTE -->
     <IonAlert
@@ -164,7 +164,7 @@ import {
 } from '@ionic/vue';
 import {closeOutline} from "ionicons/icons";
 
-import Header from "@/components/Header.vue";
+import HeaderComponent from "@/components/HeaderComponent.vue";
 import {ref} from 'vue';
 import {onIonViewWillEnter} from "@ionic/vue";
 import {
