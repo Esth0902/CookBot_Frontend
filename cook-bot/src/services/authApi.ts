@@ -1,6 +1,6 @@
 import {jwtDecode} from "jwt-decode";
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://cookbot-k5ss.onrender.com';
 const TOKEN_KEY = 'jwtToken';
 
 export function saveToken(token: string): void {
