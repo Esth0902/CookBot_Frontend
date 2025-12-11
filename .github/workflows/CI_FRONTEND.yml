@@ -1,0 +1,64 @@
+name: CI Front-end Vue/Ionic
+
+# 1. Déclencheurs (Triggers)
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+# 2. Variables d'environnement globales
+env:
+  NODE_VERSION: '22.19.0'
+  FRONTEND_DIRECTORY: './cook-bot'
+
+# 3. Définition des Tâches (Jobs)
+jobs:
+  build_and_lint_frontend:
+    name: Build & Lint Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1: Cloner le code du dépôt GitHub
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      # Étape 2: Configurer l'environnement Node.js
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm' # Utiliser le cache pour les dépendances npm (accélère les builds)
+          cache-dependency-path: ${{ env.FRONTEND_DIRECTORY }}/package-lock.json # Précisez le chemin
+
+      # Étape 3: Aller dans le répertoire du front-end
+      - name: Navigate to frontend directory
+        run: cd ${{ env.FRONTEND_DIRECTORY }}
+
+      # Étape 4: Installer les dépendances
+      - name: Install dependencies (npm install)
+        # Exécuté dans le répertoire de travail défini par 'working-directory'
+        run: npm install
+        working-directory: ${{ env.FRONTEND_DIRECTORY }}
+
+      # Étape 5: Lancer le linting (vérification du style et des erreurs de code)
+      # Remplacez 'lint' par le nom de votre script de linting dans package.json
+      - name: Run lint check
+        # La CI échouera si des erreurs de linting sont trouvées
+        run: npm run lint
+        working-directory: ${{ env.FRONTEND_DIRECTORY }}
+
+      # Étape 6: Compiler le projet pour vérifier qu'il n'y a pas d'erreurs de compilation ou de TypeScript
+      # Remplacez 'build' par le nom de votre script de compilation dans package.json
+      - name: Build project (npm run build)
+        # Ceci génère les fichiers finaux et vérifie la validité du code
+        run: npm run build
+        working-directory: ${{ env.FRONTEND_DIRECTORY }}
+
+      # Étape 7: (Optionnel) Archiver l'artefact (les fichiers de build finaux)
+      # Ceci est utile si une étape de Déploiement (CD) doit suivre
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vue-dist
+          path: ${{ env.FRONTEND_DIRECTORY }}/dist # Adaptez si votre répertoire de sortie est différent
