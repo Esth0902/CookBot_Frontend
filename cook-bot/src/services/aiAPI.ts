@@ -19,6 +19,7 @@ export interface Recipe {
     isFavorite?: boolean;
     ingredients: Ingredient[];
     steps: Step[];
+    tips?: [];
 }
 
 export interface Metric {
