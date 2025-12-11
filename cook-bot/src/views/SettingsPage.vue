@@ -5,8 +5,8 @@
     <ion-content class="settings-content">
       <section class="settings-section">
         <div class="settings-card">
-          <h2 class="settings-card-title">Préférences de cuisine</h2>
-          <p class="settings-card-text">Valeurs par défaut utilisées pour les recettes</p>
+          <h2 class="settings-card-title">Mes préférences culinaires</h2>
+          <p class="settings-card-text">Personnalise tes recettes selon tes envies</p>
 
           <div class="settings-row">
             <span>Nombre de personnes</span>
@@ -26,7 +26,7 @@
           </div>
 
           <div class="settings-row">
-            <span>Filtrer les résultats avec mes exclusions</span>
+            <span>Appliquer mes exclusions dans les recherches</span>
             <ion-toggle
                 :checked="settings.applyFiltersInSearch"
                 @ionChange="toggleApplyFilters"
