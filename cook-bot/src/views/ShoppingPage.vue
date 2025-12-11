@@ -82,12 +82,12 @@
               <!-- CHECKBOX -->
               <IonCheckbox
                   slot="start"
-                  v-model="item.checked"
-
+                  v-model="item.bought"
+                  @ionChange="handleItemChangeAndSave(list, item)"
               />
 
               <!-- AFFICHAGE / EDITION -->
-              <div class="editable-content" :class="{ checked: item.checked }">
+              <div class="editable-content" :class="{ checked: item.bought }">
 
                 <!-- MODE AFFICHAGE -->
                 <IonLabel
@@ -104,23 +104,23 @@
                   <IonInput
                       v-model="item.quantity"
                       type="number"
-                      placeholder="Qté"
+                      placeholder="Quantité"
                       class="input-quantity"
-                      @ionBlur="handleItemUpdate(list, item)"
+                      @ionBlur="handleItemChangeAndSave(list, item)"
                   />
                   <IonInput
                       v-model="item.unit"
                       type="text"
                       placeholder="Unité"
                       class="input-unit"
-                      @ionBlur="handleItemUpdate(list, item)"
+                      @ionBlur="handleItemChangeAndSave(list, item)"
                   />
                   <IonInput
                       v-model="item.name"
                       type="text"
                       placeholder="Nom de l'aliment"
                       class="input-name"
-                      @ionBlur="handleItemUpdate(list, item)"
+                      @ionBlur="handleItemChangeAndSave(list, item)"
                   />
                 </div>
               </div>
@@ -245,17 +245,36 @@ function moveArrayElement(arr: any[], from: number, to: number) {
   arr.splice(to, 0, item);
 }
 
-async function handleItemReorder(ev: any, list: ShoppingList) {
+async function handleItemReorder(ev: CustomEvent, list: ShoppingList) {
   const from = ev.detail.from;
   const to = ev.detail.to;
   const listIndex = shoppingLists.value.findIndex(l => l.id === list.id);
-  if (listIndex === -1) {
+  if (listIndex === -1 || !shoppingLists.value[listIndex].items) {
     ev.detail.complete(false);
     return;
   }
 
-  moveArrayElement(shoppingLists.value[listIndex].items!, from, to);
-  ev.detail.complete(true);
+  const items = shoppingLists.value[listIndex].items!;
+  const itemToMove = items.splice(from, 1)[0];
+  items.splice(to, 0, itemToMove);
+
+  items.forEach((item, index) => {
+    item.sequence = index;
+  });
+  try {
+    await updateShoppingList(shoppingLists.value[listIndex]);
+
+    setToastMessage(`Ordre des aliments mis à jour.`, true, 'secondary');
+
+    ev.detail.complete(true);
+
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'ordre :", error);
+    const message = error instanceof Error ? error.message : "Impossible de sauvegarder le nouvel ordre.";
+    setToastMessage(message, true, 'danger');
+
+    ev.detail.complete(false);
+  }
 }
 
 async function confirmAddList(data: any) {
@@ -397,7 +416,7 @@ async function handleDeleteItem(listId: number, itemId: number) {
   }
 }
 
-async function handleItemUpdate(list: ShoppingList, item: ShoppingItem) {
+async function handleItemChangeAndSave(list: ShoppingList, item: ShoppingItem) {
 
   editingItemId.value = null;
 
@@ -407,18 +426,14 @@ async function handleItemUpdate(list: ShoppingList, item: ShoppingItem) {
   }
 
   try {
-    const updatedList = await updateItem(list.id!, item);
-    const listIndex = shoppingLists.value.findIndex(l => l.id === list.id);
-    if (listIndex !== -1) {
-      shoppingLists.value[listIndex] = updatedList;
-    }
-
-    setToastMessage(`Aliment '${item.name}' mis à jour.`, true, 'secondary');
+    await updateShoppingList(list);
+    const action = item.checked ? "acheté(e)" : "désélectionné(e)";
+    setToastMessage(`Aliment '${item.name}' marqué comme ${action}.`, true, 'secondary');
 
   } catch (error) {
-    console.error("Erreur de mise à jour d'item :", error);
-    const message = error instanceof Error ? error.message : "Impossible de sauvegarder la modification.";
-    setToastMessage(message, true, 'danger');
+  console.error("Erreur de mise à jour d'item :", error);
+  const message = error instanceof Error ? error.message : "Impossible de sauvegarder la modification.";
+  setToastMessage(message, true, 'danger');
   }
 }
 
