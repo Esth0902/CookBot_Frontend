@@ -240,11 +240,6 @@ onIonViewWillEnter(async () => {
   }
     });
 
-function moveArrayElement(arr: any[], from: number, to: number) {
-  const item = arr.splice(from, 1)[0];
-  arr.splice(to, 0, item);
-}
-
 async function handleItemReorder(ev: CustomEvent, list: ShoppingList) {
   const from = ev.detail.from;
   const to = ev.detail.to;

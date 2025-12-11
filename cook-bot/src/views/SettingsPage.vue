@@ -163,11 +163,6 @@ function applyPreferencesFromBackend(prefs: UserPreference[]) {
   originalAllergens.value = [... allValues];
 }
 
-async function reloadPreferences() {
-  const prefs = await getUserPreferences();
-  applyPreferencesFromBackend(prefs);
-}
-
 onIonViewWillEnter(async () => {
   try {
     const [backendSettings, prefs] = await Promise.all([
