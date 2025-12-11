@@ -174,7 +174,7 @@ import {
   deleteShoppingList,
   addItemToList,
   deleteItem,
-  updateItem, updateShoppingList,
+  updateShoppingList,
 }
   from "@/services/shoppingApi";
 
