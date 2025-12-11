@@ -56,6 +56,7 @@ const generateRecipeOnDemand = async () => {
 
   try {
     dailyRecipe.value = await generateDailyRecipe();
+    console.log(dailyRecipe.value)
   } catch (e) {
     console.error("Erreur génération :", e);
   }

@@ -422,7 +422,7 @@ async function handleItemChangeAndSave(list: ShoppingList, item: ShoppingItem) {
 
   try {
     await updateShoppingList(list);
-    const action = item.checked ? "acheté(e)" : "désélectionné(e)";
+    const action = item.bought ? "acheté(e)" : "désélectionné(e)";
     setToastMessage(`Aliment '${item.name}' marqué comme ${action}.`, true, 'secondary');
 
   } catch (error) {
@@ -524,10 +524,6 @@ function activateEditMode(itemId: number) {
 
 .shopping-list-item:last-child {
   border-bottom: none;
-}
-
-.checkbox {
-  margin-right: 12px;
 }
 
 .checked {
