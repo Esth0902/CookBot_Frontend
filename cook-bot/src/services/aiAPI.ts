@@ -12,14 +12,18 @@ export interface Step {
     description: string;
 }
 
+export interface TipsGroup {
+    tips: string[];
+}
+
 export interface Recipe {
-    id : number;
+    id: number;
     name: string;
     durationMinutes: number;
     isFavorite?: boolean;
     ingredients: Ingredient[];
     steps: Step[];
-    tips?: [];
+    tips?: TipsGroup[];
 }
 
 export interface Metric {
