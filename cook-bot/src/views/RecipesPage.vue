@@ -7,7 +7,7 @@ import { computed, ref } from 'vue';
 import type {IngredientInput, Recipe} from '@/services/aiAPI';
 import { useAiRecipes } from '@/composables/useAiRecipes';
 import AiRecipeResult from "@/components/AiRecipeResult.vue";
-import Header from "@/components/Header.vue";
+import HeaderComponent from "@/components/HeaderComponent.vue";
 import { useFavoriteRecipes } from '@/composables/useFavoriteRecipes';
 import { heart, heartOutline, closeOutline } from 'ionicons/icons';
 
@@ -92,7 +92,7 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
 
 <template>
   <ion-page>
-    <Header />
+    <HeaderComponent />
 
     <ion-content fullscreen class="recipes-content">
 

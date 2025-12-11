@@ -35,8 +35,8 @@ function formatDateForBackend(date: Date): string {
 }
 
 export async function getMetricByRangeDate(dateStart:Date,dateEnd:Date): Promise<Metric[]> {
-    let dateEndFormat = formatDateForBackend(dateEnd);
-    let dateStartFormat = formatDateForBackend(dateStart);
+    const dateEndFormat = formatDateForBackend(dateEnd);
+    const dateStartFormat = formatDateForBackend(dateStart);
 
     console.log(dateStartFormat,dateEndFormat)
     const response = await authFetch(`/api/v1/metric?dateStart=${dateStartFormat}&dateEnd=${dateEndFormat}`, {

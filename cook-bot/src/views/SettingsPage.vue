@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <Header/>
+    <HeaderComponent/>
 
     <ion-content class="settings-content">
       <section class="settings-section">
@@ -116,7 +116,7 @@ import {
 } from '@ionic/vue';
 import { reactive, ref } from 'vue';
 import { add, remove, close, checkmark, alertCircle } from 'ionicons/icons';
-import Header from "@/components/Header.vue";
+import HeaderComponent from "@/components/HeaderComponent.vue";
 import {
   getUserPreferences,
   getUserSetting,

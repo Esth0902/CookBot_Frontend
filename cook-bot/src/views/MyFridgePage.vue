@@ -1,6 +1,6 @@
   <template>
     <ion-page>
-      <Header />
+      <HeaderComponent />
 
       <ion-content class="fridge-content">
 
@@ -115,7 +115,7 @@
   import { usePhotoGallery } from '@/composables/usePhotoGallery';
   import { useAiRecipes } from '@/composables/useAiRecipes';
   import AiRecipeResult from "@/components/AiRecipeResult.vue";
-  import Header from "@/components/Header.vue";
+  import HeaderComponent from "@/components/HeaderComponent.vue";
 
   const { photos, takePhoto, deletePhoto } = usePhotoGallery();
 

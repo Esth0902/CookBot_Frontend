@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <Header />
+    <HeaderComponent />
 
     <ion-content fullscreen>
       <ion-card class="favorites-card ion-margin">
@@ -69,10 +69,8 @@ import {
   IonCardTitle,
   IonCardContent,
   IonButton,
-  IonList,
   IonItem,
   IonLabel,
-  IonText,
   IonPage,
   IonIcon,
   IonContent,
@@ -84,7 +82,7 @@ import { heart } from 'ionicons/icons';
 import type { Recipe } from '@/services/aiAPI';
 import { useFavoriteRecipes } from '@/composables/useFavoriteRecipes';
 
-import Header from '@/components/Header.vue';
+import HeaderComponent from '@/components/HeaderComponent.vue';
 import AiRecipeResult from '@/components/AiRecipeResult.vue';
 
 const {

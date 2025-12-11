@@ -8,11 +8,11 @@ import {
   onIonViewWillEnter,
 } from '@ionic/vue';
 
-import Header from "@/components/Header.vue";
+import HeaderComponent from "@/components/HeaderComponent.vue";
 import {getToken, getUserPlan} from "@/services/authApi";
 import { jwtDecode} from "jwt-decode";
 import {computed, ref} from "vue";
-import Pricing from "@/components/Pricing.vue";
+import PricingComponent from "@/components/PricingComponent.vue";
 import {generateDailyRecipe} from "@/services/aiAPI";
 import type {Recipe} from '@/types/Recipe';
 
@@ -71,7 +71,7 @@ const onTrialActivated = () => {
 
 <template>
   <ion-page>
-    <Header />
+    <HeaderComponent />
     <ion-content class="home-content">
 
         <!-- Section de bienvenue -->
@@ -94,7 +94,7 @@ const onTrialActivated = () => {
           <img src="/banner.png" alt="Publicité CookBot" class="banner" />
 
           <div class="home-offer-card">
-            <Pricing @trialActivated="onTrialActivated" />
+            <PricingComponent @trialActivated="onTrialActivated" />
           </div>
 
           <div class="home-separator">
