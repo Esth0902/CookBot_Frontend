@@ -11,7 +11,7 @@ import { createRecipe } from '@/services/recipeAPI'
 import { useUserSettings } from '@/composables/useUserSettings';
 
 const props = withDefaults(defineProps<{
-  aiError: string;
+  aiError: string | null;
   aiRecipe: Recipe | null;
   aiRecipeTitles: RecipeTitle[] | null;
   showSaveButton?: boolean;

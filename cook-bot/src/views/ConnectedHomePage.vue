@@ -15,6 +15,7 @@ import {computed, ref} from "vue";
 import PricingComponent from "@/components/PricingComponent.vue";
 import {generateDailyRecipe} from "@/services/aiAPI";
 import type {Recipe} from '@/services/aiAPI';
+import AiRecipeResult from "@/components/AiRecipeResult.vue";
 
 const userRole = ref("FREE");
 const username = ref("Utilisateur");
@@ -105,17 +106,18 @@ const onTrialActivated = () => {
 
 
         <!-- SECTION PREMIUM -->
-        <section v-if="userRole === 'PREMIUM'" class="home-premium">
+      <section v-if="userRole === 'PREMIUM'" class="home-premium">
 
-          <!-- Recette du jour -->
-          <div class="home-section">
+        <div>
+
+          <div class="home-section" v-if="!dailyRecipe">
             <div class="home-card">
               <h2 class="home-card-title">Recette du jour</h2>
 
-              <div v-if="!dailyRecipe && !generatingRecipe">
+              <div v-if="!generatingRecipe">
                 <p class="home-card-text">
-                Clique ci-dessous pour découvrir ta recette du jour
-              </p>
+                  Clique ci-dessous pour découvrir ta recette du jour
+                </p>
 
                 <ion-button
                     size="small"
@@ -127,54 +129,35 @@ const onTrialActivated = () => {
                 </ion-button>
               </div>
 
-          <!-- ÉTAT 2 : Chargement -->
-          <div v-if="generatingRecipe" class="home-card-loading">
-            <ion-spinner name="crescent"></ion-spinner>
-            <p>Génération en cours...</p>
-          </div>
-
-          <!-- ÉTAT 3 : Recette générée -->
-          <div v-if="dailyRecipe && !generatingRecipe" class="home-card-content fade-in">
-
-              <h3 class="home-card-sub">{{ dailyRecipe.name }}</h3>
-              <p class="home-card-text">{{ dailyRecipe.durationMinutes }} min</p>
-            <div class="recipe-section">
-              <h4 class="recipe-title">Ingrédients</h4>
-
-              <ul class="recipe-list">
-                <li v-for="(ing, index) in dailyRecipe.ingredients" :key="index">
-                  <span class="ing-qty">{{ ing.quantity }} {{ ing.unit }}</span>
-                  <span class="ing-name">{{ ing.name }}</span>
-                </li>
-              </ul>
-            </div>
-
-            <!-- ÉTAPES -->
-            <div class="recipe-section">
-              <h4 class="recipe-title">Étapes</h4>
-
-              <ol class="recipe-steps">
-                <li v-for="(step, index) in dailyRecipe.steps" :key="index">
-                  {{ step.description }}
-                </li>
-              </ol>
-            </div>
-            </div>
-            </div>
-
-            <div class="home-separator">
-              <img src="/wave1.png" alt="separator" />
-            </div>
-
-          <!-- Astuce du chef -->
-          <div v-if="firstTip" class="home-section">
-            <div class="home-card">
-              <h2 class="home-card-title">L'astuce du chef</h2>
-              <p class="home-card-text">{{ firstTip }}</p>
+              <div v-if="generatingRecipe" class="home-card-loading">
+                <ion-spinner name="crescent"></ion-spinner>
+                <p style="margin-top:10px;">Génération en cours...</p>
+              </div>
             </div>
           </div>
+
+          <div v-if="dailyRecipe && !generatingRecipe">
+
+            <AiRecipeResult
+                :ai-error="null"
+                :ai-recipe="dailyRecipe"
+                :ai-recipe-titles="null"
+                :show-save-button="true"
+            />
+
           </div>
-        </section>
+
+        </div>
+
+        <div v-if="firstTip" class="home-section">
+          <div class="home-card">
+            <h2 class="home-card-title">L'astuce du chef</h2>
+            <p class="home-card-text">{{ firstTip }}</p>
+          </div>
+        </div>
+
+      </section>
+
 
     </ion-content>
   </ion-page>
