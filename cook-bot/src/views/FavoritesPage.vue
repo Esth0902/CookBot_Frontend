@@ -81,10 +81,11 @@ import { heart } from 'ionicons/icons';
 
 import type { Recipe } from '@/services/aiAPI';
 import { useFavoriteRecipes } from '@/composables/useFavoriteRecipes';
-
+import { useUserSettings } from '@/composables/useUserSettings';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import AiRecipeResult from '@/components/AiRecipeResult.vue';
 
+const { loadUserSettings } = useUserSettings();
 const {
   loadingRecipes,
   favoriteRecipes,
@@ -97,6 +98,7 @@ const expandedRecipeId = ref<number | null>(null);
 
 onIonViewWillEnter(() => {
   fetchRecipes();
+  loadUserSettings();
 });
 
 function toggleExpanded(rec: Recipe) {

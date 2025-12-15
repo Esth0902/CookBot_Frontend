@@ -10,6 +10,9 @@ import AiRecipeResult from "@/components/AiRecipeResult.vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import { useFavoriteRecipes } from '@/composables/useFavoriteRecipes';
 import { heart, heartOutline, closeOutline } from 'ionicons/icons';
+import { useUserSettings } from '@/composables/useUserSettings';
+
+const { loadUserSettings } = useUserSettings();
 
 const {
   loadingAi,
@@ -35,6 +38,7 @@ const expandedRecipeId = ref<number | null>(null);
 
 onIonViewWillEnter(() => {
   fetchRecipes();
+  loadUserSettings();
 });
 
 function toggleExpanded(rec: Recipe) {
@@ -206,8 +210,6 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
           <img src="/wave1.png" alt="separator">
         </div>
       </section>
-
-
 
       <!-- SECTION : RECETTES SAUVEGARDEES -->
       <section class="recipes-section">

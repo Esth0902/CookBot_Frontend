@@ -2,10 +2,13 @@
 import {
   IonText,
   IonButton,
+  IonIcon,
 } from '@ionic/vue';
-import {ref, withDefaults, watch } from 'vue';
+import {ref, withDefaults, watch, computed } from 'vue';
+import { add, remove, peopleOutline } from 'ionicons/icons';
 import type { Recipe, RecipeTitle } from '@/services/aiAPI';
 import { createRecipe } from '@/services/recipeAPI'
+import { useUserSettings } from '@/composables/useUserSettings';
 
 const props = withDefaults(defineProps<{
   aiError: string;
@@ -60,6 +63,40 @@ async function onSaveRecipe() {
     saving.value = false;
   }
 }
+
+const { nbPeople } = useUserSettings();
+const currentServings = ref(1);
+
+watch(() => props.aiRecipe, () => {
+  if(props.aiRecipe) {
+    currentServings.value = nbPeople.value || 1;
+  }
+}, {immediate: true});
+
+function updateServings(delta: number) {
+  const newVal = currentServings.value + delta;
+  if (newVal >= 1 && newVal <= 50) {
+    currentServings.value = newVal;
+  }
+}
+
+function formatQuantity(num: number) {
+  if (!num) return '';
+  return Number.isInteger(num) ? num : parseFloat(num.toFixed(1));
+}
+
+const scaledIngredients = computed(() => {
+  if (!props.aiRecipe || !props.aiRecipe.ingredients) return [];
+  const ratio = currentServings.value
+  return props.aiRecipe.ingredients.map(ing => {
+    if (!ing.quantity) return ing;
+    return {
+      ...ing,
+      quantity: ing.quantity * ratio
+    };
+  });
+});
+
 </script>
 
 <template>
@@ -104,9 +141,24 @@ async function onSaveRecipe() {
     <div v-if="aiRecipe" class="home-section">
       <div class="home-card">
         <h2 class="home-card-title">{{ aiRecipe.name }}</h2>
-        <p class="home-card-text">{{ aiRecipe.durationMinutes }} min</p>
 
-        <!-- bouton sauvegarde -->
+        <div class="recipe-meta-row">
+          <span class="home-card-text meta-time">{{ aiRecipe.durationMinutes }} min</span>
+
+          <div class="servings-control">
+            <ion-icon :icon="peopleOutline" class="servings-icon" />
+            <ion-button size="small" fill="clear" @click="updateServings(-1)" class="servings-btn">
+              <ion-icon :icon="remove" slot="icon-only" />
+            </ion-button>
+
+            <span class="servings-value">{{ currentServings }}</span>
+
+            <ion-button size="small" fill="clear" @click="updateServings(1)" class="servings-btn">
+              <ion-icon :icon="add" slot="icon-only" />
+            </ion-button>
+          </div>
+        </div>
+
         <div v-if="showSaveButton" class="home-save-wrapper">
           <ion-button
               class="save-recipe-btn"
@@ -126,13 +178,14 @@ async function onSaveRecipe() {
 
 
         <div class="home-card-content fade-in">
-          <!-- Ingrédients -->
           <div class="recipe-section">
             <h4 class="recipe-title">Ingrédients</h4>
             <ul class="recipe-list">
-              <li v-for="(ing, idx) in aiRecipe.ingredients" :key="idx">
-                <span class="ing-qty">{{ ing.quantity }} {{ ing.unit }}</span>
-                <span class="ing-name">{{ ing.name }}</span>
+              <li v-for="(ing, idx) in scaledIngredients" :key="idx">
+                <span class="ing-qty" v-if="ing.quantity">
+                  {{ formatQuantity(ing.quantity) }} {{ ing.unit }}
+                </span>
+                <span class="ing-qty" v-else></span> <span class="ing-name">{{ ing.name }}</span>
               </li>
             </ul>
           </div>

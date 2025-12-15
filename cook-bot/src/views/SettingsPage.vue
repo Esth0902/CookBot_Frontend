@@ -124,6 +124,7 @@ import {
   addUserPreferences,
   deleteUserPreferenceByName, UserPreference,
 } from "@/services/settingsAPI";
+import { useUserSettings } from '@/composables/useUserSettings';
 
 interface Settings {
   servings: number;
@@ -221,9 +222,14 @@ function getCurrentAllergens(): string[] {
   return Array.from(new Set([...settings.allergens, ...settings.avoidList]));
 }
 
+const { nbPeople } = useUserSettings();
+
 async function saveNow() {
   try {
     await updateUserNbPeople(settings.servings);
+
+    nbPeople.value = settings.servings;
+
     const current = getCurrentAllergens();
     const original = originalAllergens.value;
     const toAdd = current.filter(a => !original.includes(a));
