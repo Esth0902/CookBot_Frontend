@@ -2,32 +2,22 @@
   <ion-page>
     <HeaderComponent />
 
-    <ion-content fullscreen>
-      <ion-card class="favorites-card ion-margin">
-        <ion-card-header>
-          <ion-card-title class="favorites-title">Mes recettes favorites</ion-card-title>
-        </ion-card-header>
+    <ion-content fullscreen class="favorites-content">
 
-        <ion-card-content>
+      <section class="favorites-section">
+        <div class="favorites-card">
+          <h2 class="favorites-card-title">Mes recettes favorites</h2>
 
-          <div v-if="favoriteRecipes.length" class="favorites-list">
-            <ion-card
-                v-for="rec in favoriteRecipes"
-                :key="rec.id"
-                class="favorites-item-card"
-            >
+          <ion-list v-if="favoriteRecipes.length" class="favorites-list-container">
+            <div v-for="rec in favoriteRecipes" :key="rec.id">
 
-              <ion-item lines="none">
-                <ion-label
-                    @click="toggleExpanded(rec)"
-                    class="favorites-item-title"
-                >
-                  {{ rec.name }}
+              <ion-item lines="none" class="favorite-item">
+                <ion-label @click="toggleExpanded(rec)" class="favorite-title-label">
+                  <h3 class="favorite-title-clickable">{{ rec.name }}</h3>
                 </ion-label>
 
                 <ion-button
                     slot="end"
-                    size="small"
                     fill="clear"
                     color="secondary"
                     :disabled="togglingFavoriteID === rec.id"
@@ -40,7 +30,7 @@
 
               <div
                   v-if="expandedRecipeId === rec.id"
-                  class="favorites-details"
+                  class="favorites-expand-area"
               >
                 <AiRecipeResult
                     :ai-error="''"
@@ -49,25 +39,26 @@
                 />
               </div>
 
-            </ion-card>
-          </div>
+            </div>
+          </ion-list>
 
           <p v-else-if="!loadingRecipes" class="favorites-empty-text">
-            Aucune recette favorite pour l’instant.
+            Vous n'avez pas encore de recettes favorites.
           </p>
 
-        </ion-card-content>
-      </ion-card>
+        </div>
+
+        <div class="favorites-separator">
+          <img src="/wave1.png" alt="separator">
+        </div>
+      </section>
+
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import {
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonButton,
   IonItem,
   IonLabel,
@@ -115,149 +106,128 @@ function onToggleFavorite(rec: Recipe) {
 </script>
 
 <style scoped>
-
-.favorites-title {
-  font-weight: 700;
-  color: var(--ion-color-light);
-  text-align: center;
-  font-size: 1.6rem;
-  margin-bottom: 6px;
-}
-
-
-.favorites-card {
-  border-radius: 18px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--ion-color-primary);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-}
-
-
-.favorites-list {
+/* --- STRUCTURE GLOBALE --- */
+.favorites-content {
+  padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 26px;
+  padding-bottom: 120px;
 }
 
-.favorites-item-card {
+.favorites-section {
+  padding: 10px 10px;
+}
+
+/* --- CARTE PRINCIPALE (Glassmorphism) --- */
+.favorites-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 25px;
   border-radius: 16px;
-  background: rgba(255,255,255,0.03);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--ion-color-primary);
-  padding: 0;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-  transition: 0.25s ease;
+  text-align: center;
+  transition: 0.3s;
 }
 
-.favorites-item-card:hover {
-  transform: translateY(-3px);
+.favorites-card:hover {
+  transform: translateY(-4px);
 }
 
-
-.favorites-item-title {
-  font-size: 1.15rem;
-  color: var(--ion-color-secondary);
+.favorites-card-title {
+  color: var(--ion-color-light);
+  font-size: 1.6rem;
+  margin-bottom: 20px;
   font-weight: 600;
+}
+
+/* --- LISTE & ITEMS --- */
+.favorites-list-container {
+  background: transparent;
+  padding: 0;
+}
+
+.favorite-item {
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.favorite-title-label {
   cursor: pointer;
+}
+
+.favorite-title-clickable {
+  font-size: 1.15rem;
+  color: var(--ion-color-light);
+  font-weight: 500;
+  margin: 0;
   transition: 0.2s;
 }
 
-.favorites-item-title:hover {
+.favorite-title-clickable:hover {
   color: var(--ion-color-primary);
-  text-decoration: underline;
 }
 
-
+/* --- BOUTON COEUR --- */
 .favorites-heart-btn {
-  --padding-start: 6px;
-  --padding-end: 6px;
-  --padding-top: 4px;
-  --padding-bottom: 4px;
-  font-size: 22px;
+  font-size: 24px;
+  margin: 0;
+  --padding-start: 8px;
+  --padding-end: 8px;
   transition: transform 0.2s;
 }
 
 .favorites-heart-btn:hover {
-  transform: scale(1.2);
+  transform: scale(1.15);
 }
 
-.favorites-details {
-  padding: 14px 18px 18px;
-  background: rgba(255,255,255,0.04);
-  border-top: 1px solid var(--ion-color-primary);
-  border-radius: 0 0 16px 16px;
-  animation: fadeIn 0.25s ease;
+/* --- ZONE DÉPLIÉE --- */
+
+.favorites-expand-area {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 10px;
+
+  animation: slideDown 0.3s ease-out;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-
+/* --- TEXTE VIDE --- */
 .favorites-empty-text {
-  text-align: center;
-  opacity: 0.7;
-  padding-top: 12px;
   font-style: italic;
+  opacity: 0.7;
+  margin-top: 20px;
   font-size: 1rem;
 }
 
+/* --- IMAGE SEPARATEUR --- */
+.favorites-separator img {
+  width: 230px;
+  margin: 15px auto 0;
+  display: block;
+}
+
+/* RESPONSIVE */
 @media (max-width: 480px) {
-
-  /* Carte principale */
+  .favorites-content {
+    padding: 16px;
+  }
   .favorites-card {
-    padding: 2px !important;
-    border-radius: 14px;
+    padding: 15px;
   }
-
-  /* Titre */
-  .favorites-title {
-    font-size: 1,9rem;
-    margin-bottom: 2px;
-  }
-
-  /* Liste */
-  .favorites-list {
-    gap: 10px;
-  }
-
-  /* Carte d’un élément */
-  .favorites-item-card {
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-  }
-
-  /* Titre de recette */
-  .favorites-item-title {
-    font-size: 1rem;
-  }
-
-  /* Bouton favori */
-  .favorites-heart-btn {
-    --padding-start: 2px;
-    --padding-end: 2px;
-    --padding-top: 2px;
-    --padding-bottom: 2px;
-    font-size: 18px;
-  }
-
-  /* Détails de recette */
-  .favorites-details {
-    padding: 5px 5px 5px;
-  }
-
-  /* Message vide */
-  .favorites-empty-text {
-    font-size: 0.9rem;
-    opacity: 0.6;
-  }
-
-  /* Ion-item interne */
-  ion-item {
-    --padding-start: 5px;
-    --padding-end: 5px;
-    --min-height: 42px;
+  .favorites-card-title {
+    font-size: 1.4rem;
   }
 }
 </style>
