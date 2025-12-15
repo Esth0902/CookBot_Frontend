@@ -69,11 +69,22 @@
           <div class="settings-input-column">
             <ion-input
                 v-model="newAvoid"
-                placeholder="ex: coriandre, champignons..."
+                :placeholder="isPremium ? 'ex: coriandre, champignons...' : 'Option réservée aux membres Premium'"
                 @keyup.enter="addAvoid"
                 :clear-input="true"
+                :disabled="!isPremium"
             />
-            <ion-button @click="addAvoid" :disabled="!newAvoid.trim()" class="settings-btn-add">Ajouter</ion-button>
+            <ion-button
+                @click="isPremium ? addAvoid() : router.push('/tabs/home')"
+                :disabled="isPremium && !newAvoid.trim()"
+                class="settings-btn-add"
+                :color="isPremium ? 'light' : 'warning'"
+            >
+              <span v-if="isPremium">Ajouter</span>
+              <span v-else style="display: flex; align-items: center; gap: 8px;">
+                 <ion-icon :icon="lockClosed" /> Débloquer
+              </span>
+            </ion-button>
           </div>
         </div>
       </section>
@@ -88,6 +99,10 @@
             Réinitialiser
           </ion-button>
         </div>
+
+        <ion-button expand="block" fill="clear" color="medium" router-link="/legal" class="ion-margin-top">
+          Mentions Légales & Confidentialité
+        </ion-button>
       </section>
 
       <ion-toast
@@ -115,7 +130,7 @@ import {
   onIonViewWillEnter,
 } from '@ionic/vue';
 import { reactive, ref } from 'vue';
-import { add, remove, close, checkmark, alertCircle } from 'ionicons/icons';
+import { add, remove, close, checkmark, alertCircle, lockClosed } from 'ionicons/icons';
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import {
   getUserPreferences,
@@ -124,7 +139,10 @@ import {
   addUserPreferences,
   deleteUserPreferenceByName, UserPreference,
 } from "@/services/settingsAPI";
+import { isPremiumUser } from '@/services/authApi';
+
 import { useUserSettings } from '@/composables/useUserSettings';
+import router from "@/router";
 
 interface Settings {
   servings: number;
@@ -146,7 +164,7 @@ const settings = reactive<Settings>({ ...defaultSettings });
 const newAvoid = ref('');
 const toast = reactive({ open: false, message: '' });
 const originalAllergens = ref<string[]>([]);
-
+const isPremium = ref(false);
 const commonAllergens = [
   'Gluten',
   'Lactose',
@@ -166,6 +184,7 @@ function applyPreferencesFromBackend(prefs: UserPreference[]) {
 
 onIonViewWillEnter(async () => {
   try {
+    isPremium.value = isPremiumUser();
     const [backendSettings, prefs] = await Promise.all([
       getUserSetting(),
       getUserPreferences(),

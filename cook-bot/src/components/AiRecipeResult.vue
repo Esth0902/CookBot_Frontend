@@ -4,7 +4,7 @@ import {
   IonButton,
   IonIcon,
 } from '@ionic/vue';
-import {ref, withDefaults, watch, computed } from 'vue';
+import {ref, watch, computed } from 'vue';
 import { add, remove, peopleOutline } from 'ionicons/icons';
 import type { Recipe, RecipeTitle } from '@/services/aiAPI';
 import { createRecipe } from '@/services/recipeAPI'
