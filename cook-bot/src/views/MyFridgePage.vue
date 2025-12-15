@@ -114,7 +114,7 @@
     IonImg,
     IonButton,
   } from '@ionic/vue';
-  import { computed, ref, watch, nextTick } from 'vue';
+  import { ref, watch, nextTick } from 'vue';
   import { usePhotoGallery } from '@/composables/usePhotoGallery';
   import { useAiRecipes } from '@/composables/useAiRecipes';
   import AiRecipeResult from "@/components/AiRecipeResult.vue";

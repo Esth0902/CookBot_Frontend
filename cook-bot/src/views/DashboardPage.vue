@@ -53,7 +53,6 @@ import {ref} from "vue";
 import type {Metric} from "@/services/aiAPI";
 import {getMetricByRangeDate} from "@/services/metricAPI";
 import {Chart, BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend} from 'chart.js';
-import HeaderComponent from "@/components/HeaderComponent.vue";
 import LogoutButton from "@/components/LogoutButton.vue";
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
