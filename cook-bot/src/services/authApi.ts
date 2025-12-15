@@ -1,7 +1,7 @@
 import {jwtDecode} from "jwt-decode";
+import router from "@/router";
 
-//'http://localhost:8080';
-const API_BASE_URL = 'https://cookbot-k5ss.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const TOKEN_KEY = 'jwtToken';
 
 export function saveToken(token: string): void {
@@ -131,10 +131,16 @@ export async function authFetch(path: string, options: RequestInit = {}): Promis
         Authorization: `Bearer ${token}`,
     };
 
-    return fetch(`${API_BASE_URL}${path}`, {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
         ...options,
         headers,
     });
+
+    if (response.status === 401) {
+        clearToken();
+        router.push('/login');
+    }
+    return response;
 }
 
 export async function startTrial(): Promise<string> {
