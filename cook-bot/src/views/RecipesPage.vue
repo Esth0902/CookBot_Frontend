@@ -3,7 +3,7 @@ import {
   IonButton, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonList,
   IonPage, IonText, onIonViewWillEnter,
 } from '@ionic/vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch, nextTick } from 'vue';
 import type {IngredientInput, Recipe} from '@/services/aiAPI';
 import { useAiRecipes } from '@/composables/useAiRecipes';
 import AiRecipeResult from "@/components/AiRecipeResult.vue";
@@ -35,6 +35,23 @@ const {
 } = useFavoriteRecipes();
 
 const expandedRecipeId = ref<number | null>(null);
+
+const contentRef = ref<any>(null);
+const resultsRef = ref<HTMLElement | null>(null);
+
+watch([aiRecipe, aiRecipeTitles], async ([newRecipe, newTitles]) => {
+  if (newRecipe || (newTitles && newTitles.length > 0)) {
+    await nextTick();
+    setTimeout(() => {
+      if (contentRef.value && resultsRef.value) {
+        const y = resultsRef.value.offsetTop;
+        console.log("Tentative de scroll vers :", y);
+        contentRef.value.$el.scrollToPoint(0, y - 60, 600);
+      }
+    }, 150);
+
+  }
+});
 
 onIonViewWillEnter(() => {
   fetchRecipes();
@@ -98,7 +115,7 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
   <ion-page>
     <HeaderComponent />
 
-    <ion-content fullscreen class="recipes-content">
+    <ion-content fullscreen class="recipes-content" ref="contentRef">
 
       <!-- SECTION : INGREDIENTS -->
       <section class="recipes-section">
@@ -282,13 +299,15 @@ const handleGenerateRecipeFromTitle = async (title: string) => {
 
 
       <!-- IA RESULTAT -->
-      <AiRecipeResult
-          :ai-error="aiError"
-          :ai-recipe="aiRecipe"
-          :ai-recipe-titles="aiRecipeTitles"
-          :show-save-button="true"
-          @select-title="handleGenerateRecipeFromTitle"
-      />
+      <div ref="resultsRef">
+        <AiRecipeResult
+            :ai-error="aiError"
+            :ai-recipe="aiRecipe"
+            :ai-recipe-titles="aiRecipeTitles"
+            :show-save-button="true"
+            @select-title="handleGenerateRecipeFromTitle"
+        />
+      </div>
 
     </ion-content>
   </ion-page>

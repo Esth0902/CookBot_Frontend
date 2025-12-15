@@ -2,7 +2,7 @@
     <ion-page>
       <HeaderComponent />
 
-      <ion-content class="fridge-content">
+      <ion-content class="fridge-content" ref="contentRef">
 
         <!-- Section de bienvenue -->
         <section class="fridge-section">
@@ -88,6 +88,7 @@
         </section>
 
         <!-- Résultats IA -->
+        <div ref="resultsRef">
         <section v-if="aiRecipe || aiRecipeTitles || aiError">
           <AiRecipeResult
               :ai-error="aiError"
@@ -97,6 +98,8 @@
               @select-title="handleGenerateRecipeFromTitle"
           />
         </section>
+        </div>
+
 
       </ion-content>
     </ion-page>
@@ -111,11 +114,15 @@
     IonImg,
     IonButton,
   } from '@ionic/vue';
-
+  import { computed, ref, watch, nextTick } from 'vue';
   import { usePhotoGallery } from '@/composables/usePhotoGallery';
   import { useAiRecipes } from '@/composables/useAiRecipes';
   import AiRecipeResult from "@/components/AiRecipeResult.vue";
   import HeaderComponent from "@/components/HeaderComponent.vue";
+
+
+  const contentRef = ref<any>(null);
+  const resultsRef = ref<HTMLElement | null>(null);
 
   const { photos, takePhoto, deletePhoto } = usePhotoGallery();
 
@@ -128,6 +135,16 @@
     getRecipeFromImage,
     getRecipeFromDish,
   } = useAiRecipes();
+
+  watch([aiRecipe, aiRecipeTitles], async ([newRecipe, newTitles]) => {
+    if (newRecipe || (newTitles && newTitles.length > 0)) {
+      await nextTick();
+      if (contentRef.value && resultsRef.value) {
+        const y = resultsRef.value.offsetTop;
+        contentRef.value.$el.scrollToPoint(0,y -20,600);
+      }
+    }
+  });
 
   const handleGenerateRecipeTitleFromImage = async () => {
     const photo = photos.value[0];
