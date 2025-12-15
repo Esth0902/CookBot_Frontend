@@ -1,5 +1,4 @@
 import {jwtDecode} from "jwt-decode";
-import router from "@/router";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const TOKEN_KEY = 'jwtToken';
@@ -138,7 +137,8 @@ export async function authFetch(path: string, options: RequestInit = {}): Promis
 
     if (response.status === 401) {
         clearToken();
-        router.push('/login');
+        window.location.href = '/login';
+        throw new Error("Session expirée")
     }
     return response;
 }
