@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/TabsPage.vue';
-import { isAuthenticated } from '@/services/authApi';
+import { isAuthenticated, getUserPlan } from '@/services/authApi';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -31,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path:'/dashboard',
         component: () => import ('@/views/DashboardPage.vue'),
-        meta: {requiresAuth: true}
+        meta: {requiresAuth: true, role: 'ADMIN'}
     },
     {
         path: '/tabs/',
@@ -86,13 +86,32 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const loggedIn = isAuthenticated();
+    const userRole = getUserPlan();
+
     if (to.meta.requiresAuth && !loggedIn) {
-        next('/login');
-    } else if (to.meta.guestOnly && loggedIn) {
-        next('/tabs/home');
-    } else {
-        next();
+        return next('/login');
     }
+
+    if (to.meta.requiresAuth && !loggedIn) {
+        if (userRole === 'ADMIN') {
+            return next('/dashboard')
+        }
+        return next('/tabs/home')
+    }
+
+    if (loggedIn) {
+        if (userRole === 'ADMIN') {
+            if(to.path !== '/dashboard') {
+                return next('/dashboard');
+            }
+        }
+        else {
+            if(to.meta.role === 'ADMIN' || to.path === '/dahsboard') {
+                return next('/tabs/home');
+            }
+        }
+    }
+    next()
 });
 
 export default router

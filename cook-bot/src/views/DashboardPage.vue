@@ -3,6 +3,7 @@
     <ion-header>
       <ion-toolbar>
         <ion-title>Dashboard</ion-title>
+        <logout-button />
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
@@ -52,6 +53,8 @@ import {ref} from "vue";
 import type {Metric} from "@/services/aiAPI";
 import {getMetricByRangeDate} from "@/services/metricAPI";
 import {Chart, BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend} from 'chart.js';
+import HeaderComponent from "@/components/HeaderComponent.vue";
+import LogoutButton from "@/components/LogoutButton.vue";
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
