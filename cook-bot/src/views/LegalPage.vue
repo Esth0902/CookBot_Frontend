@@ -41,18 +41,20 @@
           <li>Personnaliser les recettes générées par l'intelligence artificielle.</li>
           <li>Vérifier votre statut d'abonnement (Free/Premium).</li>
         </ul>
+        <p>Ces traitements sont fondés sur l’exécution du contrat liant l’utilisateur à Cookbot et sur l’intérêt légitime au bon fonctionnement du service.</p>
 
         <h3>3. Partage des données</h3>
         <p>Vos données personnelles ne sont <strong>jamais vendues</strong> à des tiers publicitaires.</p>
         <p>Elles peuvent être transmises de manière sécurisée à nos sous-traitants techniques uniquement pour le fonctionnement du service :</p>
         <ul>
           <li><strong>Hébergement :</strong> Render (USA/Europe).</li>
-          <li><strong>Intelligence Artificielle :</strong> Le contenu de vos demandes (ingrédients, préférences) est envoyé à OpenRouter pour générer les recettes.</li>
+          <li><strong>Intelligence Artificielle :</strong> Le contenu de vos demandes (ingrédients, préférences) est envoyé à OpenRouter uniquement pour générer les recettes.</li>
         </ul>
+        <p>Certains traitements peuvent impliquer un transfert de données hors de l’Union européenne. Dans ce cas, Cookbot veille à ce que des garanties appropriées soient mises en place conformément au RGPD.</p>
 
         <h3>4. Vos droits</h3>
         <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez supprimer définitivement votre compte et toutes les données associées directement depuis la page "Settings" de l'application.</p>
-
+        <p>Toute demande relative aux données personnelles peut être adressée à : contact@cookbot.com</p>
         <h3>5. Cookies et Stockage Local</h3>
         <p>
           Nous n'utilisons <strong>aucun cookie publicitaire ou de traçage tiers</strong>.
@@ -63,6 +65,15 @@
         <p>
           Conformément aux recommandations de la CNIL et au RGPD, ces traceurs étant "strictement nécessaires à la fourniture du service", ils ne nécessitent pas de consentement préalable.
         </p>
+        <h3>6. Durée de conservation</h3>
+        <p>Les données personnelles sont conservées tant que le compte utilisateur est actif.
+          En cas de suppression du compte, l’ensemble des données associées est supprimé.</p>
+        
+        <p> Responsable du traitement des données : </p>
+        <ul>
+          <li>Cookbot - Team Cookbot</li>
+          <li>Contact : contact@cookbot.com</li>
+        </ul>
       </div>
 
       <div v-if="segment === 'mentions'" class="legal-text">
@@ -70,7 +81,7 @@
 
         <h3>Éditeur</h3>
         <p>
-          <strong>Team Cookbot</strong><br>
+          <strong>Team Cookbot - Projet étudiant</strong><br>
           Adresse : Rue de la Limite 6, 1300 Wavre, Belgique<br>
           Contact : contact@cookbot.com
         </p>
