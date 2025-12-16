@@ -1,6 +1,6 @@
 import {jwtDecode} from "jwt-decode";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 const TOKEN_KEY = 'jwtToken';
 
 export function saveToken(token: string): void {
@@ -117,6 +117,15 @@ export async function login(username: string, password: string): Promise<LoginRe
     saveToken(token);
 
     return body;
+}
+
+export async function anonymizeUser(): Promise<void> {
+    const response = await authFetch(`/api/v1/user/anonymate`, {
+        method: 'PUT',
+    });
+    if (!response.ok) {
+        throw new Error("Erreur lors de l'anonymisation");
+    }
 }
 
 export async function authFetch(path: string, options: RequestInit = {}): Promise<Response> {

@@ -103,6 +103,17 @@
         <ion-button expand="block" fill="clear" color="medium" router-link="/legal" class="ion-margin-top">
           Mentions Légales & Confidentialité
         </ion-button>
+
+      <ion-button
+          expand="block"
+          color="danger"
+          fill="outline"
+          @click="confirmDeleteAccount"
+          class="ion-margin-top"
+      >
+        Supprimer mon compte
+      </ion-button>
+
       </section>
 
       <ion-toast
@@ -128,6 +139,7 @@ import {
   IonButton,
   IonBadge,
   onIonViewWillEnter,
+  alertController,
 } from '@ionic/vue';
 import { reactive, ref } from 'vue';
 import { add, remove, close, checkmark, alertCircle, lockClosed } from 'ionicons/icons';
@@ -139,8 +151,7 @@ import {
   addUserPreferences,
   deleteUserPreferenceByName, UserPreference,
 } from "@/services/settingsAPI";
-import { isPremiumUser } from '@/services/authApi';
-
+import { isPremiumUser, anonymizeUser, clearToken } from '@/services/authApi';
 import { useUserSettings } from '@/composables/useUserSettings';
 import router from "@/router";
 
@@ -294,6 +305,40 @@ async function resetAll() {
   } finally {
     toast.open = true;
   }
+}
+
+async function deleteAccount() {
+  try {
+    await anonymizeUser();
+    clearToken();
+    toast.message = "Compte supprimé et anonymisé.";
+    toast.open = true;
+    setTimeout(() => {
+      router.replace('/login');
+    }, 1000);
+  } catch (error) {
+    console.error(error);
+    toast.message = "Impossible de supprimer le compte, réessayez.";
+    toast.open = true;
+  }
+}
+
+async function confirmDeleteAccount() {
+  const alert = await alertController.create({
+    header: 'Supprimer mon compte ?',
+    message: 'Cette action est irréversible. Vos données personnelles seront anonymisées et vous perdrez l\'accès à vos recettes.',
+    buttons: [
+      { text: 'Annuler', role: 'cancel' },
+      {
+        text: 'Confirmer la suppression',
+        role: 'destructive',
+        handler: async () => {
+          await deleteAccount();
+        },
+      },
+    ],
+  });
+  await alert.present();
 }
 
 </script>
