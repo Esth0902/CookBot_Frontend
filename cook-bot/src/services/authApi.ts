@@ -98,14 +98,16 @@ export async function login(username: string, password: string): Promise<LoginRe
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Identifiants invalides');
+        const errorBody = await response.json();
+        const errorText = errorBody.errorList?.[0] || "Erreur lors de la connexion"
+        throw new Error(errorText);
     }
 
     const body: LoginResponse = await response.json();
 
     if (!body.success) {
-        throw new Error(body.responseMessage || "Erreur lors de la connexion");
+        const errorBody = body.errorList?.[0] || body.responseMessage || "Erreur lors de la connexion";
+        throw new Error(errorBody)
     }
 
     const token = body.data?.accessToken;
