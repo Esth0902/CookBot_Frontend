@@ -124,7 +124,7 @@ const selectionAlertInputs = computed(() => {
   const inputs: any[] = [];
 
   inputs.push({
-    label: '➕ Créer une nouvelle liste...',
+    label: 'Créer une nouvelle liste...',
     type: 'radio',
     value: 'NEW',
     handler: () => {}
