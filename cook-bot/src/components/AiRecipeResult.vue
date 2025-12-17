@@ -3,10 +3,18 @@ import {
   IonText,
   IonButton,
   IonIcon,
+  IonAlert,
+  IonToast,
 } from '@ionic/vue';
-import {ref, watch, computed } from 'vue';
-import { add, remove, peopleOutline } from 'ionicons/icons';
+import { ref, watch, computed } from 'vue';
+import { add, remove, peopleOutline, cartOutline } from 'ionicons/icons';
 import type { Recipe, RecipeTitle } from '@/services/aiAPI';
+import {
+  getAllShoppingLists,
+  createShoppingList,
+  addItemToList,
+  type ShoppingList
+} from '@/services/shoppingApi';
 import { createRecipe } from '@/services/recipeAPI'
 import { useUserSettings } from '@/composables/useUserSettings';
 
@@ -27,22 +35,17 @@ const saving = ref(false);
 const saveSuccess = ref(false);
 const saveError = ref('');
 
-watch(
-    () => props.aiRecipe,
-    () => {
-      saving.value = false;
-      saveSuccess.value = false;
-      saveError.value = '';
-    }
-);
+watch(() => props.aiRecipe, () => {
+  saving.value = false;
+  saveSuccess.value = false;
+  saveError.value = '';
+});
 
 async function onSaveRecipe() {
   if (!props.aiRecipe) return;
-
   saving.value = true;
   saveError.value = '';
   saveSuccess.value = false;
-
   try {
     await createRecipe({
       name: props.aiRecipe.name,
@@ -51,14 +54,10 @@ async function onSaveRecipe() {
       ingredients: props.aiRecipe.ingredients,
       steps: props.aiRecipe.steps,
     });
-
     saveSuccess.value = true;
   } catch (err) {
     console.error(err);
-    saveError.value =
-        err instanceof Error
-            ? err.message
-            : 'Erreur lors de la sauvegarde de la recette';
+    saveError.value = err instanceof Error ? err.message : 'Erreur sauvegarde';
   } finally {
     saving.value = false;
   }
@@ -75,9 +74,7 @@ watch(() => props.aiRecipe, () => {
 
 function updateServings(delta: number) {
   const newVal = currentServings.value + delta;
-  if (newVal >= 1 && newVal <= 50) {
-    currentServings.value = newVal;
-  }
+  if (newVal >= 1 && newVal <= 50) currentServings.value = newVal;
 }
 
 function formatQuantity(num: number) {
@@ -87,20 +84,181 @@ function formatQuantity(num: number) {
 
 const scaledIngredients = computed(() => {
   if (!props.aiRecipe || !props.aiRecipe.ingredients) return [];
-  const ratio = currentServings.value
+  const ratio = currentServings.value;
   return props.aiRecipe.ingredients.map(ing => {
     if (!ing.quantity) return ing;
-    return {
-      ...ing,
-      quantity: ing.quantity * ratio
-    };
+    return { ...ing, quantity: ing.quantity * ratio };
   });
 });
 
+const isSelectionAlertOpen = ref(false);
+const isCreateAlertOpen = ref(false);
+const userLists = ref<ShoppingList[]>([]);
+const addingToShop = ref(false);
+
+const toastMessage = ref('');
+const isToastOpen = ref(false);
+const toastColor = ref('success');
+
+function setToastMessage(message: string, isOpen: boolean, color: string = 'success') {
+  toastMessage.value = message;
+  isToastOpen.value = isOpen;
+  toastColor.value = color;
+}
+
+async function openShoppingSelection() {
+  if (!props.aiRecipe) return;
+  addingToShop.value = true;
+
+  try {
+    userLists.value = await getAllShoppingLists();
+    isSelectionAlertOpen.value = true;
+  } catch (e) {
+    setToastMessage("Impossible de charger vos listes", true, "danger");
+  } finally {
+    addingToShop.value = false;
+  }
+}
+
+const selectionAlertInputs = computed(() => {
+  const inputs: any[] = [];
+
+  inputs.push({
+    label: '➕ Créer une nouvelle liste...',
+    type: 'radio',
+    value: 'NEW',
+    handler: () => {}
+  });
+
+  userLists.value.forEach(list => {
+    inputs.push({
+      label: list.shoppingListName,
+      type: 'radio',
+      value: list.id
+    });
+  });
+  return inputs;
+});
+
+const selectionAlertButtons = [
+  {
+    text: 'Annuler',
+    role: 'cancel',
+    handler: () => { isSelectionAlertOpen.value = false; }
+  },
+  {
+    text: 'Suivant',
+    handler: (data: any) => {
+      if (!data) return false;
+
+      if (data === 'NEW') {
+        isSelectionAlertOpen.value = false;
+        setTimeout(() => { isCreateAlertOpen.value = true; }, 150);
+      } else {
+        addIngredientsToExistingList(data);
+      }
+    }
+  }
+];
+
+const createListAlertInputs = [
+  {
+    placeholder: "Titre de la nouvelle liste",
+    name: 'listName',
+    type: 'text',
+    id: 'list-name-input',
+  },
+];
+
+const createListAlertButtons = [
+  {
+    text: 'Annuler',
+    role: 'cancel',
+    handler: () => { console.log('Création annulée'); },
+  },
+  {
+    text: 'Ajouter',
+    role: 'confirm',
+    handler: (data: any) => {
+      confirmCreateAndAdd(data);
+    },
+  },
+];
+
+async function addIngredientsToExistingList(listId: number) {
+  addingToShop.value = true;
+  try {
+    await processIngredientsAddition(listId);
+    setToastMessage("Ingrédients ajoutés à la liste !", true, "secondary");
+  } catch (error) {
+    console.error(error);
+    setToastMessage("Erreur lors de l'ajout", true, "danger");
+  } finally {
+    addingToShop.value = false;
+  }
+}
+
+async function confirmCreateAndAdd(data: any) {
+  const name = data.listName;
+  if (!name || name.trim() === "") {
+    setToastMessage("Le nom de la liste ne peut pas être vide.", true, 'warning');
+    return false;
+  }
+
+  addingToShop.value = true;
+  try {
+    const newList = await createShoppingList(name);
+    if(newList && newList.id) {
+      await processIngredientsAddition(newList.id);
+      setToastMessage(`Liste '${name}' créée et remplie !`, true, 'secondary');
+      isCreateAlertOpen.value = false;
+    }
+  } catch (error) {
+    console.error("Erreur création :", error);
+    let msg = error instanceof Error ? error.message : "Erreur inconnue";
+    setToastMessage(msg, true, 'danger');
+  } finally {
+    addingToShop.value = false;
+  }
+}
+
+async function processIngredientsAddition(listId: number) {
+  const promises = scaledIngredients.value.map(ing => {
+    const qty = ing.quantity ? parseFloat(ing.quantity.toString()) : 1;
+    const unit = ing.unit || '';
+    return addItemToList(listId, ing.name, qty, unit);
+  });
+  await Promise.all(promises);
+}
 </script>
 
 <template>
   <div>
+    <IonAlert
+        :is-open="isSelectionAlertOpen"
+        header="Où ajouter les ingrédients ?"
+        :inputs="selectionAlertInputs"
+        :buttons="selectionAlertButtons"
+        @didDismiss="isSelectionAlertOpen = false"
+    />
+
+    <IonAlert
+        :is-open="isCreateAlertOpen"
+        header="Ajouter une nouvelle liste"
+        :inputs="createListAlertInputs"
+        :buttons="createListAlertButtons"
+        @didDismiss="isCreateAlertOpen = false"
+    />
+
+    <IonToast
+        :is-open="isToastOpen"
+        :message="toastMessage"
+        :duration="3000"
+        :color="toastColor"
+        position="bottom"
+        @didDismiss="isToastOpen = false"
+    />
+
     <!-- Erreur -->
     <div v-if="aiError" class="home-section">
       <div class="home-card home-card-error">
@@ -159,9 +317,11 @@ const scaledIngredients = computed(() => {
           </div>
         </div>
 
-        <div v-if="showSaveButton" class="home-save-wrapper">
+        <div class="actions-container">
+
           <ion-button
-              class="save-recipe-btn"
+              v-if="showSaveButton"
+              class="action-btn save-btn"
               size="small"
               :disabled="saving || saveSuccess"
               @click="onSaveRecipe"
@@ -171,10 +331,22 @@ const scaledIngredients = computed(() => {
             <span v-else>Recette sauvegardée ✔️</span>
           </ion-button>
 
-          <p v-if="saveError" class="home-card-text" style="color: var(--ion-color-danger)">
-            {{ saveError }}
-          </p>
+          <ion-button
+              class="action-btn shop-btn"
+              size="small"
+              fill="outline"
+              :disabled="addingToShop"
+              @click="openShoppingSelection"
+          >
+            <ion-icon slot="start" :icon="cartOutline"></ion-icon>
+            <span v-if="!addingToShop">Ajouter aux courses</span>
+            <span v-else>Ajout en cours...</span>
+          </ion-button>
         </div>
+
+        <p v-if="saveError" class="home-card-text" style="color: var(--ion-color-danger); margin-top:10px;">
+          {{ saveError }}
+        </p>
 
 
         <div class="home-card-content fade-in">
@@ -339,21 +511,27 @@ const scaledIngredients = computed(() => {
   animation: fadeSlideUp 0.6s ease forwards;
 }
 
-.save-recipe-btn {
-  width: auto !important;
-  min-width: 140px;
-  max-width: 200px;
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 
-  --padding-top: 6px;
-  --padding-bottom: 6px;
-  --padding-start: 14px;
-  --padding-end: 14px;
+.action-btn {
+  width: auto;
+  min-width: 200px;
+  --border-radius: 10px;
+  font-size: 0.9rem;
+  margin: 0;
+}
 
-  font-size: 0.85rem;
-  border-radius: 10px;
-
-  margin: 10px auto 0; /* centre le bouton */
-  display: block;
+.shop-btn {
+  --color: var(--ion-color-secondary);
+  --border-color: var(--ion-color-secondary);
+  --background-hover: rgba(var(--ion-color-secondary-rgb), 0.1);
 }
 
 @keyframes fadeSlideUp {
@@ -413,15 +591,6 @@ const scaledIngredients = computed(() => {
   .recipe-steps li {
     font-size: 0.9rem;
     padding: 4px 0;
-  }
-
-  .save-recipe-btn {
-    min-width: 120px;
-    --padding-start: 10px;
-    --padding-end: 10px;
-    --padding-top: 4px;
-    --padding-bottom: 4px;
-    font-size: 0.75rem;
   }
 
   .recipe-ideas-list {
