@@ -54,10 +54,8 @@ import {
   heartOutline,
 } from 'ionicons/icons';
 import { useUserSettings } from '@/composables/useUserSettings';
-import { ref } from "vue";
 import {onIonViewWillEnter} from "@ionic/vue";
 const { isPremium, checkPremiumStatus } = useUserSettings();
-const userRole = ref("FREE")
 
 onIonViewWillEnter(() => {
   checkPremiumStatus();
