@@ -52,11 +52,11 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { isAuthenticated, startTrial } from '@/services/authApi';
+import { useUserSettings } from '@/composables/useUserSettings';
 
 const router = useRouter();
-
 const emit = defineEmits(['trialActivated']);
-
+const { checkPremiumStatus } = useUserSettings();
 const loading = ref(false);
 const error = ref('');
 const success = ref('');
@@ -75,8 +75,11 @@ const onStartTrial = async () => {
   try {
     const msg = await startTrial();
     success.value = msg || 'Essai Premium activé 🎉';
-
+    checkPremiumStatus();
     emit('trialActivated');
+    setTimeout(() => {
+      router.push('/tabs/home');
+    }, 1500);
   } catch (e: any) {
     console.error(e);
     error.value = e.message || 'Erreur lors de l’activation de l’essai';
