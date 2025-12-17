@@ -215,7 +215,7 @@ async function confirmCreateAndAdd(data: any) {
     }
   } catch (error) {
     console.error("Erreur création :", error);
-    let msg = error instanceof Error ? error.message : "Erreur inconnue";
+    const msg = error instanceof Error ? error.message : "Erreur inconnue";
     setToastMessage(msg, true, 'danger');
   } finally {
     addingToShop.value = false;
