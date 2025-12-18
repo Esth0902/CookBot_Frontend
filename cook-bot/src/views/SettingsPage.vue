@@ -128,7 +128,6 @@ import {
   IonChip,
   IonContent,
   IonInput,
-  IonToggle,
   IonButton,
   IonBadge,
   onIonViewWillEnter,
