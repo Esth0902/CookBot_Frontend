@@ -12,8 +12,8 @@ function estimateBytes(dataUrl: string) {
 
 async function compressDataUrl(
     dataUrl: string,
-    maxW = 1200,
-    maxH = 1200,
+    maxW = 800,
+    maxH = 800,
     maxBytes = 450_000
 ): Promise<string> {
     const img = new Image();
@@ -35,48 +35,40 @@ async function compressDataUrl(
     const ctx = canvas.getContext('2d');
     if (!ctx) return dataUrl;
 
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, 0, 0, width, height);
 
-    let q = 0.75;
-    let out = "";
-
-    while (q >= 0.4) {
-        out = canvas.toDataURL('image/jpeg', q);
+    let q = 0.7;
+    while (q >= 0.35) {
+        const out = canvas.toDataURL('image/jpeg', q);
         if (estimateBytes(out) <= maxBytes) return out;
-        q -= 0.1;
+        q -= 0.08;
     }
-
-    return out || canvas.toDataURL('image/jpeg', 0.4);
+    return canvas.toDataURL('image/jpeg', 0.35);
 }
 
 export const usePhotoGallery = () => {
     const photos = ref<UserPhoto[]>([]);
 
     const takePhoto = async () => {
-        try {
-            const photo = await Camera.getPhoto({
-                source: CameraSource.Camera,
-                resultType: CameraResultType.DataUrl,
-                quality: 90,
-                width: 1600,
-            });
+        const photo = await Camera.getPhoto({
+            source: CameraSource.Camera,
+            resultType: CameraResultType.DataUrl,
+            quality: 80,
+            width: 2000,
+            height: 2000,
+        });
 
-            const compressed = await compressDataUrl(
-                photo.dataUrl!,
-                1200,
-                1200,
-                450_000
-            );
+        const compressed = await compressDataUrl(
+            photo.dataUrl!,
+            800,
+            800,
+            450_000
+        );
 
-            photos.value = [{
-                filepath: Date.now() + '.jpg',
-                webviewPath: compressed,
-            }];
-        } catch (e) {
-            console.warn("User cancelled or camera error", e);
-        }
+        photos.value = [{
+            filepath: Date.now() + '.jpg',
+            webviewPath: compressed,
+        }];
     };
 
     const deletePhoto = (photoToDelete?: UserPhoto) => {
@@ -85,5 +77,7 @@ export const usePhotoGallery = () => {
             : [];
     };
 
-    return { photos, takePhoto, deletePhoto };
+    return {
+        photos, takePhoto, deletePhoto
+    };
 };
