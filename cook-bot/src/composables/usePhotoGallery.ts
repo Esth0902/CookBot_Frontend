@@ -5,16 +5,16 @@ export const usePhotoGallery = () => {
     const photos = ref<UserPhoto[]>([]);
     const takePhoto = async () => {
         const photo = await Camera.getPhoto({
-            resultType: CameraResultType.Uri,
+            resultType: CameraResultType.DataUrl,
             source: CameraSource.Camera,
-            quality: 70,
+            quality: 60,
             width: 1024,
             height: 1024,
         });
         const fileName = Date.now() + '.jpg';
         const savedFileImage = {
             filepath: fileName,
-            webviewPath: photo.webPath,
+            webviewPath: photo.dataUrl,
         };
 
         photos.value = [savedFileImage, ...photos.value];
