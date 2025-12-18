@@ -25,13 +25,6 @@
             </div>
           </div>
 
-          <div class="settings-row">
-            <span>Appliquer mes exclusions dans les recherches</span>
-            <ion-toggle
-                :checked="settings.applyFiltersInSearch"
-                @ionChange="toggleApplyFilters"
-            />
-          </div>
         </div>
       </section>
 
@@ -157,7 +150,6 @@ import router from "@/router";
 
 interface Settings {
   servings: number;
-  applyFiltersInSearch: boolean;
   allergens: string[];
   avoidList: string[];
   plan: 'free' | 'premium';
@@ -209,10 +201,6 @@ onIonViewWillEnter(async () => {
     toast.open = true;
   }
 });
-
-function toggleApplyFilters(ev: CustomEvent) {
-  settings.applyFiltersInSearch = !!(ev as any).detail.checked;
-}
 
 function incServings() {
   settings.servings = Math.min(12, settings.servings + 1);

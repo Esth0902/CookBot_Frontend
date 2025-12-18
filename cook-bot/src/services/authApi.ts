@@ -74,14 +74,14 @@ export async function register(username: string, password: string): Promise<Regi
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Erreur lors de l'inscription");
+        const errorText = await response.json();
+        throw new Error(errorText.message || "Erreur lors de l'inscription");
     }
 
     const body: RegisterResponse = await response.json();
 
     if (!body.success) {
-        throw new Error(body.responseMessage || "Erreur lros de l'inscription");
+        throw new Error(body.responseMessage || "Erreur lors de l'inscription");
     }
 
     return body;
@@ -146,10 +146,13 @@ export async function authFetch(path: string, options: RequestInit = {}): Promis
         headers,
     });
 
-    if (response.status === 401) {
+    const responseBis = response.clone()
+    const body = await responseBis.json();
+
+    if (response.status === 401 && body.message === "Full authentication is required to access this resource") {
         clearToken();
         window.location.href = '/login';
-        throw new Error("Session expirée")
+        throw new Error("Session expirée");
     }
     return response;
 }
