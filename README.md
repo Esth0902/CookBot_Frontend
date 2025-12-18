@@ -25,14 +25,15 @@ CookBot Frontend est une application construite avec un design **Mobile-First** 
 
 ## 🛠️ Technologies (avec explications)
 
-| :--- | :--- | :--- |
-| **Vue 3 + TypeScript** | Framework JavaScript moderne et typé pour construire l'interface. | Base de l'interface utilisateur (UI). |
-| **Capacitor** | Framework d’Ionic qui permet de porter l'application web vers un support mobile |
-| **Ionic Vue** | Framework permettant de créer des UI avec une apparence native. | Fournit les composants UI pour un design Mobile-First. |
-| **Vite** | Outil de développement rapide et léger. | Sert le serveur de développement local et optimise le build de production. |
-| **Vitest** | Framework de tests unitaires (rapide). | Vérifie le bon fonctionnement des petites fonctions et composants. |
-| **Cypress** | Framework de tests de bout en bout (E2E). | Simule l'utilisateur pour tester des parcours complets (ex: login → favori). |
-| **ESLint** | Outil d'analyse de code statique. | Garantit le respect des règles de style et évite les erreurs courantes. |
+| Technologies           | Description technique                                                           | Description fonctionnelle                                                    |
+|:-----------------------|:--------------------------------------------------------------------------------|:-----------------------------------------------------------------------------|
+| **Vue 3 + TypeScript** | Framework JavaScript moderne et typé pour construire l'interface.               | Base de l'interface utilisateur (UI).                                        |
+| **Capacitor**          | Framework d’Ionic qui permet de porter l'application web vers un support mobile |
+| **Ionic Vue**          | Framework permettant de créer des UI avec une apparence native.                 | Fournit les composants UI pour un design Mobile-First.                       |
+| **Vite**               | Outil de développement rapide et léger.                                         | Sert le serveur de développement local et optimise le build de production.   |
+| **Vitest**             | Framework de tests unitaires (rapide).                                          | Vérifie le bon fonctionnement des petites fonctions et composants.           |
+| **Cypress**            | Framework de tests de bout en bout (E2E).                                       | Simule l'utilisateur pour tester des parcours complets (ex: login → favori). |
+| **ESLint**             | Outil d'analyse de code statique.                                               | Garantit le respect des règles de style et évite les erreurs courantes.      |
 
 ---
 
