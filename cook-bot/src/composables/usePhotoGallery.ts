@@ -7,9 +7,9 @@ export const usePhotoGallery = () => {
         const photo = await Camera.getPhoto({
             resultType: CameraResultType.DataUrl,
             source: CameraSource.Camera,
-            quality: 60,
-            width: 1024,
-            height: 1024,
+            quality: 55,
+            width: 900,
+            height: 900,
         });
         const fileName = Date.now() + '.jpg';
         const savedFileImage = {
