@@ -398,9 +398,11 @@ async function handleDeleteItem(listId: number, itemId: number) {
     await deleteItem(itemId);
 
     const listIndex = shoppingLists.value.findIndex(l => l.id === listId);
-    if (listIndex !== -1) {
-      shoppingLists.value[listIndex].items =
-          shoppingLists.value[listIndex].items?.filter(i => i.id !== itemId);
+    if (listIndex !== -1 && shoppingLists.value[listIndex].items) {
+      shoppingLists.value[listIndex] = {
+        ...shoppingLists.value[listIndex],
+        items: shoppingLists.value[listIndex].items!.filter(i => i.id !== itemId)
+      };
     }
 
     setToastMessage("Aliment supprimé.", true, "secondary");
@@ -421,12 +423,17 @@ async function handleItemChangeAndSave(list: ShoppingList, item: ShoppingItem) {
   }
 
   try {
-    await updateShoppingList(list);
+    const updatedListFromServer = await updateShoppingList(list);
+    const index = shoppingLists.value.findIndex(l => l.id === list.id);
+    if (index !== -1) {
+      shoppingLists.value[index] = updatedListFromServer;
+    }
     const action = item.bought ? "acheté(e)" : "désélectionné(e)";
     setToastMessage(`Aliment '${item.name}' marqué comme ${action}.`, true, 'secondary');
 
   } catch (error) {
   console.error("Erreur de mise à jour d'item :", error);
+  shoppingLists.value = await getAllShoppingLists();
   const message = error instanceof Error ? error.message : "Impossible de sauvegarder la modification.";
   setToastMessage(message, true, 'danger');
   }
