@@ -157,7 +157,6 @@ interface Settings {
 
 const defaultSettings: Settings = {
   servings: 1,
-  applyFiltersInSearch: true,
   allergens: [],
   avoidList: [],
   plan: 'free',
