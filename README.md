@@ -41,9 +41,13 @@ CookBot Frontend est une application construite avec un design **Mobile-First** 
 
 * **Node.js** (version récente recommandée > 22).
 * **npm** (gestionnaire de paquets de Node.js > 10).
+* **Ionic CLI** (npm install -g @ionic/cli).
 
-> **Note sur la configuration :** Le frontend ne gère pas de fichier `.env`.
-L'URL du Backend est donc généralement relative (ex: `/api/users`).
+
+> **Note sur la configuration :** L'application utilise des variables d'environnement pour communiquer avec l'API.
+Créez un fichier .env à la racine du dossier cook-bot/.
+Toutes les variables d'environnement dans Vite doivent impérativement commencer par le préfixe VITE_.
+> VITE_API_BASE_URL=http://localhost:8080
 
 ---
 
@@ -68,6 +72,14 @@ npm run dev
 
 ```bash
 ionic serve
+```
+
+### 4. Déploiement mobile Android (Capacitor)
+
+```bash
+npm run build
+npx cap sync
+npx cap open android
 ```
 
 ## ⚖️ Licence
