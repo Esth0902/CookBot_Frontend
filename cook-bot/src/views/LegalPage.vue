@@ -28,10 +28,11 @@
         <h3>1. Données collectées</h3>
         <p>Dans le cadre de l'utilisation de l'application, nous collectons les données suivantes :</p>
         <ul>
-          <li><strong>Compte :</strong> Adresse email et mot de passe chiffré.</li>
+          <li><strong>Compte :</strong> Nom d'utilisateur et mot de passe chiffré.</li>
           <li><strong>Préférences :</strong> Régimes alimentaires, allergies, nombre de personnes.</li>
           <li><strong>Utilisation :</strong> Recettes générées et sauvegardées en favoris.</li>
           <li><strong>Technique :</strong> Jeton de connexion (Token) stocké localement.</li>
+          <li><strong>Métriques :</strong> Volume d'utilisation du service par compte.</li>
         </ul>
 
         <h3>2. Utilisation des données</h3>
@@ -40,8 +41,10 @@
           <li>Gérer votre authentification et sécuriser votre compte.</li>
           <li>Personnaliser les recettes générées par l'intelligence artificielle.</li>
           <li>Vérifier votre statut d'abonnement (Free/Premium).</li>
+          <li>Surveiller l'usage du service (métriques) afin de gérer les coûts liés à l'IA et détecter d'éventuels abus ou usages anormaux.</li>
         </ul>
-        <p>Ces traitements sont fondés sur l’exécution du contrat liant l’utilisateur à Cookbot et sur l’intérêt légitime au bon fonctionnement du service.</p>
+        <p>Ces traitements sont fondés sur l’exécution du contrat liant l’utilisateur à Cookbot et sur l’intérêt légitime au bon fonctionnement,
+          à la sécurité et la viabilité économique du service.</p>
 
         <h3>3. Partage des données</h3>
         <p>Vos données personnelles ne sont <strong>jamais vendues</strong> à des tiers publicitaires.</p>
@@ -68,6 +71,8 @@
         <h3>6. Durée de conservation</h3>
         <p>Les données personnelles sont conservées tant que le compte utilisateur est actif.
           En cas de suppression du compte, l’ensemble des données associées est supprimé.</p>
+        <p>Les métriques techniques peuvent être conservées sous forme agrégée ou anonymisée à des fins de statistiques et de suivi global des coûts,
+        sans possibilité d’identifier un utilisateur individuel.</p>
         
         <p> Responsable du traitement des données : </p>
         <ul>
