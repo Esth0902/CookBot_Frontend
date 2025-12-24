@@ -110,7 +110,7 @@ router.beforeEach((to, from, next) => {
             }
         }
         else {
-            if(to.meta.role === 'ADMIN' || to.path === '/dahsboard') {
+            if(to.meta.role === 'ADMIN' || to.path === '/dashboard') {
                 return next('/tabs/home');
             }
         }

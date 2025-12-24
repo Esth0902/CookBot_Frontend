@@ -53,11 +53,14 @@ async function userPhotoToBlob(photo: UserPhoto): Promise<Blob> {
 }
 
 async function handleJsonResponse<T>(response: Response, defaultError: string): Promise<T> {
+    const isJson = response.headers.get('content-type')?.includes('application/json');
+    const data = isJson ? await response.json() : null;
+
     if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || defaultError);
+        const errorMessage = data?.message || data?.responseMessage || defaultError;
+        throw new Error(errorMessage);
     }
-    return response.json() as Promise<T>;
+    return data as T;
 }
 
 async function handleBlobFormRequest<T>(

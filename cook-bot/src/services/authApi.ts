@@ -132,27 +132,32 @@ export async function anonymizeUser(): Promise<void> {
 
 export async function authFetch(path: string, options: RequestInit = {}): Promise<Response> {
     const token = getToken();
-    if (!token) {
-        throw new Error('Utilisateur non authentifié');
-    }
+    if (!token) throw new Error('Utilisateur non authentifié');
 
     const headers = {
         ...(options.headers || {}),
         Authorization: `Bearer ${token}`,
     };
 
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-        ...options,
-        headers,
-    });
+    const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
 
-    const responseBis = response.clone()
-    const body = await responseBis.json();
+    if (response.status === 401) {
+        const clonedResponse = response.clone();
+        try {
+            const body = await clonedResponse.json();
 
-    if (response.status === 401 && body.message === "Full authentication is required to access this resource") {
-        clearToken();
-        window.location.href = '/login';
-        throw new Error("Session expirée");
+            if (body.message === "Full authentication is required to access this resource" ||
+                body.responseMessage === "Full authentication is required to access this resource" ||
+                body.errorList?.includes("Unauthorized")) {
+
+                console.warn("Session expirée, redirection...");
+                clearToken();
+                window.location.href = '/login';
+                throw new Error("Session expirée");
+            }
+        } catch (e) {
+            console.log("401 métier ou erreur de parsing, on reste connecté.");
+        }
     }
     return response;
 }
